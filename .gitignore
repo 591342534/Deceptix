@@ -27,4 +27,8 @@
 *.exe
 *.out
 *.app
+*.VC.opendb
 *.VC.db
+
+# Media Files
+*.mp4
