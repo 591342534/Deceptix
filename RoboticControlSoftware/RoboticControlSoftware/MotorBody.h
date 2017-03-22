@@ -16,7 +16,10 @@ namespace MilestoneOne {
 	{
 	private:
 	public:
-
+		MotorBody()
+		{
+			
+		}
 	};
 }
 #endif

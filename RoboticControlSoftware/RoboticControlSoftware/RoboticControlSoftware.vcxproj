@@ -149,6 +149,7 @@
     <ClInclude Include="Enum.h" />
     <ClInclude Include="MotorBody.h" />
     <ClInclude Include="PktDef.h" />
+    <ClInclude Include="PktDefBody.h" />
     <ClInclude Include="PktDefHeader.h" />
   </ItemGroup>
   <ItemGroup>

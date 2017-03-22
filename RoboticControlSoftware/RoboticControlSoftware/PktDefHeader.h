@@ -14,7 +14,7 @@ typedef unsigned char uc;
 namespace MilestoneOne {
 	struct Header
 	{
-	private:
+	private:		
 	public:
 		uint PktCount;		// Value that is incremented constantly each time a packet is transmitted between the client and robot
 		uc Drive : 1;		// Set to 1 if the command is a DRIVE command
@@ -29,6 +29,19 @@ namespace MilestoneOne {
 							*/
 		uc Padding : 2;
 		uc Length;			// Contains the total number of bytes in the packet
+
+		Header()
+		{
+			PktCount = 0;
+			Drive = 0;
+			Status = 0;
+			Sleep = 0;
+			Arm = 0;
+			Claw = 0;
+			Ack = 0;
+			Padding = 0;
+			Length = 0;
+		}
 	};
 }
 #endif

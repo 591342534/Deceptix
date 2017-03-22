@@ -18,7 +18,10 @@ namespace MilestoneOne {
 	private:
 		Header Header;
 	public:
-		
+		PktDef()
+		{
+			
+		}
 	};
 }
 #endif
