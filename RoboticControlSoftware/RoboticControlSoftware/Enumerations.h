@@ -8,8 +8,12 @@
 #ifndef PROJECT_PKTDEF_ENUMERATIONS_H
 #define PROJECT_PKTDEF_ENUMERATIONS_H
 
+/* Global list of typdef aliases found below */
+typedef	unsigned int ui;
+typedef unsigned char uc;
+
 namespace MilestoneOne {
-	enum CmdType			/* Enumeration to define the command types */
+	enum CmdType			/* Enumeration to define the command types for the Robot */
 	{
 		DRIVE,
 		SLEEP,
@@ -18,24 +22,19 @@ namespace MilestoneOne {
 		ACK
 	};
 
-	enum DRIVE				/* Enumeration containing pre-defined values associated with driving directions */
+	enum Cmd				/* Enumeration to define all of the possible commands
+								for the MotorBody structure */
 	{
-		FORWARD = 1,		// Start at the index of 1, instead of 0
+		FORWARD = 1,
 		BACK,
 		RIGHT,
-		LEFT
-	};
-
-	enum ARM				/* Enumeration containing pre-defined values associated with vertical arm movement */
-	{
-		UP = 5,				// Start at the index of 5, instead of 0
-		DOWN
-	};
-
-	enum CLAW				/* Enumeration containing pre-defined values associated with arm instructions*/
-	{
-		OPEN = 7,			// Start at the index of 7, instead of 0
+		LEFT,
+		UP,
+		DOWN,
+		OPEN,
 		CLOSE
 	};
+
+	const ui HEADERSIZE = 6;	// Represents the size of the CmdPacketHeader structure in Bytes (counted manually)
 }
 #endif

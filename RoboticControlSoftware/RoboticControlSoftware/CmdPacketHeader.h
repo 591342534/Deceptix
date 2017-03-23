@@ -8,9 +8,6 @@
 #ifndef PROJECT_CMDPACKET_HEADER_H
 #define PROJECT_CMDPACKET_HEADER_H
 
-typedef	unsigned int ui;
-typedef unsigned char uc;
-
 namespace MilestoneOne {
 	struct CmdPacketHeader
 	{

@@ -24,10 +24,10 @@
     <ClInclude Include="CmdPacketHeader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CmdPacketBody.h">
+    <ClInclude Include="Enumerations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Enumerations.h">
+    <ClInclude Include="MotorBody.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

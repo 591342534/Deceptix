@@ -18,7 +18,6 @@ namespace MilestoneOne {
 	private:
 		CmdPacket CmdPacket;			// Contains Header, Data and CRC
 		char* RawBuffer;				// Stores all data in PktDef in a serialized form that is used for transmission over TCP/IP
-		const ui HEADERSIZE = 6;		// Represents the size of the Header in bytes (calculated by hand)
 	public:
 		PktDef();						// Default constructor that initializes to a safe state
 		PktDef(char*);					// Takes a RAW data buffer, parses and populates the Header, Body and CRC

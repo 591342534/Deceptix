@@ -148,8 +148,8 @@
   <ItemGroup>
     <ClInclude Include="CmdPacket.h" />
     <ClInclude Include="Enumerations.h" />
+    <ClInclude Include="MotorBody.h" />
     <ClInclude Include="PktDef.h" />
-    <ClInclude Include="CmdPacketBody.h" />
     <ClInclude Include="CmdPacketHeader.h" />
   </ItemGroup>
   <ItemGroup>

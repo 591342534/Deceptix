@@ -9,18 +9,17 @@
 #define PROJECT_CMDPACKET_H
 
 #include "CmdPacketHeader.h"
-#include "CmdPacketBody.h"
-#include "Enumerations.h"
+#include "MotorBody.h"
 
 namespace MilestoneOne {
 	struct CmdPacket
 	{
 	private:
 	public:
-		CmdPacketHeader Header;
-		//CmdPacketBody MotorBody;
-		char* Data;
-		char CRC;
+		CmdPacketHeader Header;		// Note: Structure within a structure
+		char* Data;					/* The data could be raw telemetry, empty or a MotorBody structure.
+										It must be dynamic and generic, not specific to MotorBody. - Elliot 2017 */
+		uc CRC;
 
 		CmdPacket()
 		{

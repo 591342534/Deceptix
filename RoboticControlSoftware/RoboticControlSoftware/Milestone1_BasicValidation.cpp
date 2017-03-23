@@ -38,7 +38,6 @@ int main()
 
 	//cout << endl << noshowbase << dec;
 
-
 	////Testing the PktDef creation interface based on an RxBuffer of RAW Data
 	//char buffer[9] = { 0x02, 0x00, 0x00, 0x00, 0x02, 0x09, 0x11, 0x24, 0x08 };
 	//PktDef RxPkt(buffer);
@@ -62,7 +61,7 @@ int main()
 	//else
 	//	cout << "CRC Test #1 -- FAILED" << endl;
 
-	////Test #2 -- Validawtion of an Incorrect CRC Calculation
+	////Test #2 -- Validation of an Incorrect CRC Calculation
 	//char CRCBadTest[9] = { 0x02, 0x00, 0x00, 0x00, 0x02, 0x09, 0x11, 0x24, 0x17 };
 	//Result = RxPkt.CheckCRC(CRCBadTest, 9);
 	//if (Result)
