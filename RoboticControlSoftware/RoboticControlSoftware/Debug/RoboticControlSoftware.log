@@ -1,3 +1,7 @@
 ﻿  PktDef.cpp
-MSVCRTD.lib(exe_main.obj) : error LNK2019: unresolved external symbol _main referenced in function "int __cdecl invoke_main(void)" (?invoke_main@@YAHXZ)
-C:\Users\Sean\Desktop\version-control\Academic Projects\Robotic Control Software\RoboticControlSoftware\Debug\RoboticControlSoftware.exe : fatal error LNK1120: 1 unresolved externals
+  Generating Code...
+  Compiling...
+  Milestone1_BasicValidation.cpp
+  Generating Code...
+  RoboticControlSoftware.vcxproj -> C:\Users\Sean\Desktop\version-control\Academic Projects\Robotic_Control_Software\RoboticControlSoftware\Debug\RoboticControlSoftware.exe
+  RoboticControlSoftware.vcxproj -> C:\Users\Sean\Desktop\version-control\Academic Projects\Robotic_Control_Software\RoboticControlSoftware\Debug\RoboticControlSoftware.pdb (Full PDB)

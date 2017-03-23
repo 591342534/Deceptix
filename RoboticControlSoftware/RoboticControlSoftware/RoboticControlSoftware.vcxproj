@@ -146,13 +146,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Enum.h" />
-    <ClInclude Include="MotorBody.h" />
+    <ClInclude Include="CmdPacket.h" />
+    <ClInclude Include="Enumerations.h" />
     <ClInclude Include="PktDef.h" />
-    <ClInclude Include="PktDefBody.h" />
-    <ClInclude Include="PktDefHeader.h" />
+    <ClInclude Include="CmdPacketBody.h" />
+    <ClInclude Include="CmdPacketHeader.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Milestone1_BasicValidation.cpp" />
     <ClCompile Include="PktDef.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

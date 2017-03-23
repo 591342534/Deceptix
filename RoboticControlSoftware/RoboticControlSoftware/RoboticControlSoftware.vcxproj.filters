@@ -18,21 +18,24 @@
     <ClInclude Include="PktDef.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PktDefHeader.h">
+    <ClInclude Include="CmdPacket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MotorBody.h">
+    <ClInclude Include="CmdPacketHeader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Enum.h">
+    <ClInclude Include="CmdPacketBody.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PktDefBody.h">
+    <ClInclude Include="Enumerations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PktDef.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Milestone1_BasicValidation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

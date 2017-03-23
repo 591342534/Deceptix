@@ -9,6 +9,15 @@ Description:	~ Header file containing all enumerations used for the entire proje
 #define PROJECT_PKTDEF_ENUMERATIONS_H
 
 namespace MilestoneOne {
+	enum CmdType			/* Enumeration to define the command types */
+	{
+		DRIVE,
+		SLEEP,
+		ARM,
+		CLAW,
+		ACK
+	};
+
 	enum DRIVE				/* Enumeration containing pre-defined values associated with driving directions */
 	{
 		FORWARD = 1,		// Start at the index of 1, instead of 0
