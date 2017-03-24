@@ -10,6 +10,7 @@
 #ifndef PROJECT_PKTDEF_H
 #define PROJECT_PKTDEF_H
 
+#include <string.h>
 #include "Enumerations.h"
 #include "CmdPacket.h"
 
@@ -35,6 +36,7 @@ namespace MilestoneOne {
 		void CalcCRC();					// Calculates the CRC and sets the objects packet CRC parameter
 		char* GenPacket();				/* Allocates the private RawBuffer member variable and transfers the contents from the objects member variables
 											into a RAW data packet (RawBuffer) for transmission. The address of the allocated RawBuffer is returned. */
+		~PktDef();						// Destructor for dynamic memory
 	};
 }
 #endif

@@ -1,6 +1,4 @@
-﻿  Milestone1_BasicValidation.cpp
-  Generating Code...
-  Skipping... (no relevant changes detected)
-  PktDef.cpp
-  RoboticControlSoftware.vcxproj -> C:\Users\Sean\Desktop\version-control\Academic Projects\Robotic_Control_Software\RoboticControlSoftware\Debug\RoboticControlSoftware.exe
-  RoboticControlSoftware.vcxproj -> C:\Users\Sean\Desktop\version-control\Academic Projects\Robotic_Control_Software\RoboticControlSoftware\Debug\RoboticControlSoftware.pdb (Full PDB)
+﻿  PktDef.cpp
+c:\users\sean\desktop\version-control\academic projects\robotic_control_software\visual studio solution files\roboticcontrolsoftware\pktdef.cpp(97): warning C4715: 'MilestoneOne::PktDef::GetCmd': not all control paths return a value
+  RoboticControlSoftware.vcxproj -> C:\Users\Sean\Desktop\version-control\Academic Projects\Robotic_Control_Software\Visual Studio Solution Files\Debug\RoboticControlSoftware.exe
+  RoboticControlSoftware.vcxproj -> C:\Users\Sean\Desktop\version-control\Academic Projects\Robotic_Control_Software\Visual Studio Solution Files\Debug\RoboticControlSoftware.pdb (Full PDB)

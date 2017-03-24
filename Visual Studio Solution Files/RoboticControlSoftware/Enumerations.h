@@ -13,7 +13,7 @@ typedef	unsigned int ui;
 typedef unsigned char uc;
 
 namespace MilestoneOne {
-	enum CmdType			/* Enumeration to define the command types for the Robot */
+	enum CmdType				/* Enumeration to define the command types for the Robot */
 	{
 		DRIVE,
 		SLEEP,
@@ -22,7 +22,7 @@ namespace MilestoneOne {
 		ACK
 	};
 
-	enum Cmd				/* Enumeration to define all of the possible commands
+	enum Cmd					/* Enumeration to define all of the possible commands
 								for the MotorBody structure */
 	{
 		FORWARD = 1,
