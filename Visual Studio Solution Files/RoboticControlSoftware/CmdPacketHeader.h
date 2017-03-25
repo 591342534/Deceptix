@@ -29,15 +29,15 @@ namespace MilestoneOne {
 
 		CmdPacketHeader()
 		{
-			PktCount = 0;
-			Drive = 0;
-			Status = 0;
-			Sleep = 0;
-			Arm = 0;
-			Claw = 0;
-			Ack = 0;
-			Padding = 0;
-			Length = 0;
+			PktCount = 6;
+			Drive = 1;
+			Status = 1;
+			Sleep = 1;
+			Arm = 1;
+			Claw = 1;
+			Ack = 1;
+			Padding = 1;
+			Length = 1;
 		}
 	};
 }
