@@ -96,7 +96,7 @@ MilestoneOne::CmdType MilestoneOne::PktDef::GetCmd()
 	else if (CmdPacket.Header.Arm == 1) { return ARM; }
 	else if (CmdPacket.Header.Claw == 1) { return CLAW; }
 	else if (CmdPacket.Header.Ack == 1) { return ACK; }
-	else { return ERROR; }
+	else { return UNSPECIFIED; }
 }
 
 bool MilestoneOne::PktDef::GetAck()
@@ -131,9 +131,9 @@ bool MilestoneOne::PktDef::CheckCRC(char* rawData, int bufferLength)
 {
 	// Assumption: CRC value for the current CmdPacket is initialized
 
+	char* ptr = (char*)&CmdPacket.Header.PktCount;
 	int counter = 0;
 
-	// TODO 1 - Find a new home for sizeOfNotTail
 	// Christened by Hao Chen - March 24, 2017
 	const ui sizeOfNotTail = HEADERSIZE + (sizeof(char) * CmdPacket.Header.Length);
 
@@ -141,10 +141,11 @@ bool MilestoneOne::PktDef::CheckCRC(char* rawData, int bufferLength)
 	for (ui i = 0; i < sizeOfNotTail; i++) {
 		// Check one bit at a time
 		for (int j = 0; j < 8; j++) {
-			if (((rawData[i] >> j) & 0x01) == 0x01) {
+			if (((*ptr >> j) & 0x01) == 0x01) {
 				counter++;
 			}
 		}
+		ptr++;	// Move to the next byte
 	}
 
 	return (counter == CmdPacket.Tail);
@@ -152,9 +153,9 @@ bool MilestoneOne::PktDef::CheckCRC(char* rawData, int bufferLength)
 
 void MilestoneOne::PktDef::CalcCRC()
 {
+	char* ptr = (char*)&CmdPacket.Header.PktCount;
 	int counter = 0;
 
-	// TODO 2 - Find a new home for sizeOfNotTail
 	// Christened by Hao Chen - March 24, 2017
 	const ui sizeOfNotTail = HEADERSIZE + (sizeof(char) * CmdPacket.Header.Length);
 
@@ -162,10 +163,11 @@ void MilestoneOne::PktDef::CalcCRC()
 	for (ui i = 0; i < sizeOfNotTail; i++) {
 		// Check one bit at a time
 		for (int j = 0; j < 8; j++) {
-			if (((RawBuffer[i] >> j) & 0x01) == 0x01) {
+			if (((*ptr >> j) & 0x01) == 0x01) {
 				counter++;
 			}
 		}
+		ptr++;	// Move to the next byte
 	}
 
 	// Set CRC value

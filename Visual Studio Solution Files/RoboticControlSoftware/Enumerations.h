@@ -15,7 +15,7 @@ typedef unsigned char uc;
 namespace MilestoneOne {
 	enum CmdType				/* Enumeration to define the command types for the Robot */
 	{
-		ERROR = -1,
+		UNSPECIFIED = -1,
 		DRIVE,
 		SLEEP,
 		ARM,
@@ -34,8 +34,8 @@ namespace MilestoneOne {
 		DOWN,
 		OPEN,
 		CLOSE
-	}; // TODO - FIX ME
+	};
 
-	const ui HEADERSIZE = 6;	// Represents the size of the CmdPacketHeader structure in Bytes (counted manually)
+	const ui HEADERSIZE = 8;	// Represents the size of the CmdPacketHeader structure in Bytes
 }
 #endif

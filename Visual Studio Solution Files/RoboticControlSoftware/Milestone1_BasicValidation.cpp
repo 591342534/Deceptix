@@ -14,10 +14,6 @@ int main()
 	MilestoneOne::PktDef TestPkt;
 	char *ptr;
 
-	cout << sizeof(MilestoneOne::CmdPacketHeader);
-	cout << endl << sizeof(MilestoneOne::CmdPacket);
-	cout << endl << sizeof(MilestoneOne::CmdPacket::Tail);
-
 	//Testing the PktDef creation interface based on user input
 	TestPkt.SetCmd(MilestoneOne::DRIVE);
 	TestPkt.SetBodyData((char *)&DriveCmd, 2);

@@ -17,14 +17,14 @@ namespace MilestoneOne {
 	private:
 	public:
 		CmdPacketHeader Header;		// Note: Structure within a structure
-		char* Body;					/* The data could be raw telemetry, empty or a MotorBody structure. 
-										It must be dynamic and generic, not specific to MotorBody - Elliot 2017 */
+									// It must be dynamic and generic, not specific to MotorBody - Elliot 2017
+		char* Body;					// The data could be raw telemetry, empty or a MotorBody structure. 
 		uc Tail;					// Contains the CRC value
 
 		CmdPacket()
 		{
 			Body = nullptr;
-			Tail = 255;
+			Tail = 0;
 		}
 
 		~CmdPacket()
