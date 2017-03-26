@@ -67,6 +67,9 @@ MilestoneOne::PktDef::PktDef(char* rawData)	// Constructor called when we receiv
 			of bytes to copy. This allows us to have a dynamic */
 		ptr += HEADERSIZE + HEADERSIZEOFFSET;
 
+		int k = sizeof(rawData);
+		int o = (HEADERSIZE + HEADERSIZEOFFSET);
+
 		SetBodyData(ptr, sizeof(rawData) - (HEADERSIZE + HEADERSIZEOFFSET));
 	}
 
