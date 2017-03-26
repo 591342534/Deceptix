@@ -1,7 +1,3 @@
-﻿  PktDef.cpp
-c:\users\sean\desktop\version-control\academic projects\robotic_control_software\visual studio solution files\roboticcontrolsoftware\pktdef.cpp(227): warning C4018: '<': signed/unsigned mismatch
-  Generating Code...
-  Skipping... (no relevant changes detected)
-  Milestone1_BasicValidation.cpp
+﻿  Milestone1_BasicValidation.cpp
   RoboticControlSoftware.vcxproj -> C:\Users\Sean\Desktop\version-control\Academic Projects\Robotic_Control_Software\Visual Studio Solution Files\Debug\RoboticControlSoftware.exe
   RoboticControlSoftware.vcxproj -> C:\Users\Sean\Desktop\version-control\Academic Projects\Robotic_Control_Software\Visual Studio Solution Files\Debug\RoboticControlSoftware.pdb (Full PDB)
