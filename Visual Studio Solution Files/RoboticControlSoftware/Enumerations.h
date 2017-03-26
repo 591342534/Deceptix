@@ -36,6 +36,6 @@ namespace MilestoneOne {
 		CLOSE
 	};
 
-	const ui HEADERSIZE = 8;	// Represents the size of the CmdPacketHeader structure in Bytes
+	const ui HEADERSIZE = 6;	// Represents the size of the CmdPacketHeader structure in Bytes
 }
 #endif

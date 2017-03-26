@@ -54,7 +54,7 @@ int main()
 	//Testing the PktDef CRC Calculation
 	
 	//Test #1 -- Validation of a Correct CRC Calculation
-	char CRCGoodTest[9] = { 0x02, 0x00, 0x00, 0x00, 0x02, 0x09, 0x11, 0x24, 0x08 };
+	char CRCGoodTest[9] = { 0x02, 0x00, 0x00, 0x00, 0x02, 0x09, 0x11, 0x24, 0x08 };	// Calculated CRC should be 9
 	bool Result = RxPkt.CheckCRC(CRCGoodTest, 9);
 	if (Result)
 		cout << "CRC Test #1 -- PASSED" << endl;

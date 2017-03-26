@@ -18,6 +18,7 @@ MilestoneOne::PktDef::PktDef()
 
 MilestoneOne::PktDef::PktDef(char* rawData)
 {
+	int offset = 2;
 	char* ptr = rawData;
 
 	// Extract and populate CmdPacket.Header
@@ -25,7 +26,7 @@ MilestoneOne::PktDef::PktDef(char* rawData)
 
 	/* Move the pointer past CmdPacket.Header to now
 		point to the beginning of the Body */
-	ptr += HEADERSIZE;
+	ptr += (HEADERSIZE + offset);
 
 	// Dynamically allocate the body using the previously copied CmdPacket.Header.Length
 	CmdPacket.Body = new char[CmdPacket.Header.Length];
@@ -122,8 +123,7 @@ int MilestoneOne::PktDef::GetLength()
 		CmdPacket.Header + Tail - 1 Pointer (char* Body) + MotorBody (which is a max of 2 bytes)
 	*/
 
-	return sizeof(CmdPacket.Header) + (sizeof(char) * CmdPacket.Header.Length) + sizeof(CmdPacket.Tail) - 4;
-	//sizeof(MilestoneOne::CmdPacket) + (sizeof(char)*CmdPacket.Header.Length) - 4;
+	return sizeof(MilestoneOne::CmdPacket) + (sizeof(char)*CmdPacket.Header.Length) - 4;
 }
 
 char* MilestoneOne::PktDef::GetBodyData()
@@ -140,17 +140,20 @@ bool MilestoneOne::PktDef::CheckCRC(char* rawData, int bufferLength)
 {
 	// Assumption: CRC value for the current CmdPacket is initialized
 
-	char* ptr = (char*)&CmdPacket.Header.PktCount;
+	// Calculate beforehand?
+	CalcCRC();
+
+	char* ptr = rawData;
 	int counter = 0;
 
-	// Christened by Hao Chen - March 24, 2017
-	const ui sizeOfNotTail = HEADERSIZE + (sizeof(char) * CmdPacket.Header.Length);
-
 	// Loop through rawData one byte at a time
-	for (ui i = 0; i < sizeOfNotTail; i++) {
+	for (int i = 0; i < bufferLength; i++)
+	{
 		// Check one bit at a time
-		for (int j = 0; j < 8; j++) {
-			if (((*ptr >> j) & 0x01) == 0x01) {
+		for (int j = 0; j < 8; j++)
+		{
+			if (((*ptr >> j) & 0x01) == 0x01)
+			{
 				counter++;
 			}
 		}
@@ -168,8 +171,10 @@ void MilestoneOne::PktDef::CalcCRC()
 	// Kindly ask ze pointer to point to the beginning of CmdPacket's header
 	ptr = (char*)&CmdPacket.Header;
 
+	// Loop through CmdPacket.Header one byte at a time
 	for (int hao = 0; hao < HEADERSIZE; hao++)
 	{
+		// Check one bit at a time
 		for (int stephen = 0; stephen < 8; stephen++)
 		{
 			if (((*ptr >> stephen) & 0X01) == 0X01)
@@ -177,7 +182,7 @@ void MilestoneOne::PktDef::CalcCRC()
 				counter++;
 			}
 		}
-		ptr++;
+		ptr++;	// Move to the next byte
 	}
 
 	// Done counting the number of 1's inside the Header so let's set it to nullptr to be safe
@@ -192,25 +197,28 @@ void MilestoneOne::PktDef::CalcCRC()
 		something else and counting irrelevant 1's
 	*/
 
-	// Kindly ask ze pointer to point to the CmdPacket's body (remember it's dynamic memory)
-	ptr = CmdPacket.Body;
-
-	// Loop through rawData one byte at a time
-	for (int sean = 0; sean < CmdPacket.Header.Length; sean++)
+	// If we don't point to anything, skip the code below
+	if (GetBodyData() != nullptr)
 	{
-		// Check one bit at a time
-		for (int maurice = 0; maurice < 8; maurice++)
-		{
-			if (((*ptr >> maurice) & 0x01) == 0x01)
-			{
-				counter++;
-			}
-		}
-		ptr++;	// Move to the next byte
-	}
+		// Kindly ask ze pointer to point to the CmdPacket's body (remember it's dynamic memory)
+		ptr = CmdPacket.Body;
 
-	// Done counting the number of 1's inside the Body so let's set it to nullptr to be safe
-	ptr = nullptr;
+		// Loop through CmdPacket.Body one byte at a time
+		for (int sean = 0; sean < CmdPacket.Header.Length; sean++)
+		{
+			for (int maurice = 0; maurice < 8; maurice++)
+			{
+				if (((*ptr >> maurice) & 0x01) == 0x01)
+				{
+					counter++;
+				}
+			}
+			ptr++;
+		}
+
+		// Done counting the number of 1's inside the Body so let's set it to nullptr to be safe
+		ptr = nullptr;
+	}
 
 	// Set the CmdPacket's CRC value from all of the bits that we found were 1
 	CmdPacket.Tail = counter;
@@ -218,6 +226,8 @@ void MilestoneOne::PktDef::CalcCRC()
 
 char* MilestoneOne::PktDef::GenPacket()
 {
+	int offset = 2;
+
 	// Calculate how much memory allocation is required for RawBuffer
 	// GetLength() returns the length of: Header + Body + Tail
 	int size = GetLength();
@@ -229,8 +239,8 @@ char* MilestoneOne::PktDef::GenPacket()
 	char* ptr = RawBuffer;
 
 	// Copying packet header
-	memcpy(ptr, &CmdPacket.Header, HEADERSIZE);
-	ptr += HEADERSIZE;
+	memcpy(ptr, &CmdPacket.Header, HEADERSIZE + offset);
+	ptr += (HEADERSIZE + offset);
 
 	// Copying packet body
 	memcpy(ptr, CmdPacket.Body, (sizeof(char)*CmdPacket.Header.Length));
