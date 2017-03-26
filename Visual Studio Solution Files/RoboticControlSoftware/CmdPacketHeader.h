@@ -24,7 +24,7 @@ namespace MilestoneOne {
 								send a STATUS command with ACK set to 1 as well at the bit corresponding to the command
 								also set to 1
 							*/
-		uc Padding : 2;
+		uc Padding : 1;
 		uc Length;			// Contains the total number of bytes in the body of the packet
 
 		CmdPacketHeader()

@@ -7,7 +7,7 @@
 
 #include "PktDef.h"
 
-/* Sean completed the seven functions listed below - March 24, 2017 */
+/* Sean completed the first seven functions listed below - March 24, 2017 */
 
 MilestoneOne::PktDef::PktDef()
 {
@@ -31,15 +31,16 @@ MilestoneOne::PktDef::PktDef(char* rawData)
 	CmdPacket.Body = new char[CmdPacket.Header.Length];
 
 	// Extract and populate the dynamic contents of CmdPacket.Body
-	memcpy(CmdPacket.Body, ptr, CmdPacket.Header.Length);
+	memcpy(CmdPacket.Body, ptr, sizeof(char)*CmdPacket.Header.Length);
 
 	/* Move the pointer past CmdPacket.Body to now
 		point to the beginning of the Tail */
-	ptr += CmdPacket.Header.Length;
+	ptr += sizeof(char)*CmdPacket.Header.Length;
 
 	// Extract and populate CmdPacket.Tail (aka the CRC value)
 	memcpy(&CmdPacket.Tail, ptr, sizeof(uc));
 
+	// Just to be safe, set the ptr to nullptr
 	ptr = nullptr;
 }
 
@@ -81,6 +82,12 @@ void MilestoneOne::PktDef::SetBodyData(char* rawData, int bufferLength)
 		ex: DO NOT DO => memcpy(&CmdPacket.Body, ..., ...);
 	*/
 	memcpy(CmdPacket.Body, rawData, bufferLength);
+
+	/* Set the Length variable inside the Header so
+		we can verify if there's any data inside the body
+		for future calculations/use
+	*/
+	CmdPacket.Header.Length = bufferLength;
 }
 
 void MilestoneOne::PktDef::SetPktCount(int newPktCount)
@@ -106,7 +113,7 @@ bool MilestoneOne::PktDef::GetAck()
 	return (CmdPacket.Header.Ack == 1 ? true : false);
 }
 
-/* Hao completed the six functions listed below - March 24, 2017 */
+/* Hao completed the remaining six functions listed below - March 24, 2017 */
 
 int MilestoneOne::PktDef::GetLength()
 {
@@ -114,7 +121,9 @@ int MilestoneOne::PktDef::GetLength()
 		6 + 1 - 4 + 2 = Expected value of 5 bytes
 		CmdPacket.Header + Tail - 1 Pointer (char* Body) + MotorBody (which is a max of 2 bytes)
 	*/
-	return sizeof(CmdPacket) + (sizeof(char)*CmdPacket.Header.Length) - 4;
+
+	return sizeof(CmdPacket.Header) + (sizeof(char) * CmdPacket.Header.Length) + sizeof(CmdPacket.Tail) - 4;
+	//sizeof(MilestoneOne::CmdPacket) + (sizeof(char)*CmdPacket.Header.Length) - 4;
 }
 
 char* MilestoneOne::PktDef::GetBodyData()
@@ -153,24 +162,57 @@ bool MilestoneOne::PktDef::CheckCRC(char* rawData, int bufferLength)
 
 void MilestoneOne::PktDef::CalcCRC()
 {
-	char* ptr = (char*)&CmdPacket.Header.PktCount;
+	char* ptr = nullptr;
 	int counter = 0;
 
-	// Christened by Hao Chen - March 24, 2017
-	const ui sizeOfNotTail = HEADERSIZE + (sizeof(char) * CmdPacket.Header.Length);
+	// Kindly ask ze pointer to point to the beginning of CmdPacket's header
+	ptr = (char*)&CmdPacket.Header;
+
+	for (int hao = 0; hao < HEADERSIZE; hao++)
+	{
+		for (int stephen = 0; stephen < 8; stephen++)
+		{
+			if (((*ptr >> stephen) & 0X01) == 0X01)
+			{
+				counter++;
+			}
+		}
+		ptr++;
+	}
+
+	// Done counting the number of 1's inside the Header so let's set it to nullptr to be safe
+	ptr = nullptr;
+
+	/* Next, let's count the number of bits set to 1 inside the body, CmdPacket.Body.
+		We must keep in mind that the Body is dynamic memory so we have to rely on the "Length"
+		variable inside our header, CmdPacket.Header.Length, to give us the amount of bytes that
+		has been allocated.
+
+		We MUST NOT forget to set the pointer to the beginning of this data - you will be reading
+		something else and counting irrelevant 1's
+	*/
+
+	// Kindly ask ze pointer to point to the CmdPacket's body (remember it's dynamic memory)
+	ptr = CmdPacket.Body;
 
 	// Loop through rawData one byte at a time
-	for (ui i = 0; i < sizeOfNotTail; i++) {
+	for (int sean = 0; sean < CmdPacket.Header.Length; sean++)
+	{
 		// Check one bit at a time
-		for (int j = 0; j < 8; j++) {
-			if (((*ptr >> j) & 0x01) == 0x01) {
+		for (int maurice = 0; maurice < 8; maurice++)
+		{
+			if (((*ptr >> maurice) & 0x01) == 0x01)
+			{
 				counter++;
 			}
 		}
 		ptr++;	// Move to the next byte
 	}
 
-	// Set CRC value
+	// Done counting the number of 1's inside the Body so let's set it to nullptr to be safe
+	ptr = nullptr;
+
+	// Set the CmdPacket's CRC value from all of the bits that we found were 1
 	CmdPacket.Tail = counter;
 }
 
