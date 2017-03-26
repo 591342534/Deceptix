@@ -1,6 +1,4 @@
 ﻿  PktDef.cpp
-  Milestone1_BasicValidation.cpp
-  Generating Code...
-c:\users\sean\desktop\version-control\academic projects\robotic_control_software\visual studio solution files\roboticcontrolsoftware\pktdef.cpp(146): warning C4715: 'MilestoneOne::PktDef::GetCmd': not all control paths return a value
+c:\users\sean\desktop\version-control\academic projects\robotic_control_software\visual studio solution files\roboticcontrolsoftware\pktdef.cpp(224): warning C4018: '<': signed/unsigned mismatch
   RoboticControlSoftware.vcxproj -> C:\Users\Sean\Desktop\version-control\Academic Projects\Robotic_Control_Software\Visual Studio Solution Files\Debug\RoboticControlSoftware.exe
   RoboticControlSoftware.vcxproj -> C:\Users\Sean\Desktop\version-control\Academic Projects\Robotic_Control_Software\Visual Studio Solution Files\Debug\RoboticControlSoftware.pdb (Full PDB)

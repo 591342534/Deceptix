@@ -13,10 +13,11 @@ MilestoneOne::PktDef::PktDef()
 {
 	/* Constructor inside each structure handles initialization to 0.
 		See CmdPacket.h and CmdPacketHeader.h */
+	CmdPacket.Header.Length = HEADERSIZE + sizeof(uc);
 	RawBuffer = nullptr;
 }
 
-MilestoneOne::PktDef::PktDef(char* rawData)	// Constructor called when we receive a response from the robot
+MilestoneOne::PktDef::PktDef(char* rawData)	// Constructor called when we receive a stream of raw data
 {
 	char* ptr = rawData;
 
@@ -29,21 +30,17 @@ MilestoneOne::PktDef::PktDef(char* rawData)	// Constructor called when we receiv
 		the various types of packets that we can receive.
 	*/
 
-	if (!CmdPacket.Header.Drive && !CmdPacket.Header.Status && !CmdPacket.Header.Sleep
-		&& !CmdPacket.Header.Ack && !CmdPacket.Header.Claw && !CmdPacket.Header.Ack)
+	if ((!CmdPacket.Header.Drive && !CmdPacket.Header.Status && !CmdPacket.Header.Sleep
+		&& !CmdPacket.Header.Ack && !CmdPacket.Header.Claw && !CmdPacket.Header.Ack) ||
+		(CmdPacket.Header.Sleep || CmdPacket.Header.Ack))
 	{
-		/* If none of the flag bits were set, we received a NACK (Negative Acknowledgement) response */
-		ptr = nullptr;
+		/*	If none of the flag bits were set, we received a NACK (Negative Acknowledgement) response
+				OR
+			If the SLEEP or ACK flag bit is set to 1, CmdPacket.Body's length will be 0 so don't bother allocating it.
+			Simply calculate the CRC and we're all finished
+		*/
+		CmdPacket.Header.Length = HEADERSIZE + sizeof(CmdPacket.CRC);
 		CmdPacket.Data = nullptr;
-		CalcCRC();
-	}
-	else if (CmdPacket.Header.Sleep || CmdPacket.Header.Ack)
-	{
-		/* If the SLEEP or ACK flag bit is set to 1, CmdPacket.Body's length will be 0 so don't bother allocating it.
-			Simply calculate the CRC and we're all finished */
-		ptr = nullptr;
-		CmdPacket.Data = nullptr;
-		CalcCRC();
 	}
 	else if (CmdPacket.Header.Drive || CmdPacket.Header.Claw || CmdPacket.Header.Arm)
 	{
@@ -55,6 +52,8 @@ MilestoneOne::PktDef::PktDef(char* rawData)	// Constructor called when we receiv
 		ptr += HEADERSIZE + HEADERSIZEOFFSET;
 
 		memcpy(&MotorBody, ptr, sizeof(MilestoneOne::MotorBody));
+
+		CmdPacket.Header.Length = HEADERSIZE + sizeof(CmdPacket.Data) + sizeof(CmdPacket.CRC);
 
 		// Set the CmdPacket.Data pointer to point to the MotorBody structure that has just been populated
 		CmdPacket.Data = (char*)&MotorBody;
@@ -68,14 +67,11 @@ MilestoneOne::PktDef::PktDef(char* rawData)	// Constructor called when we receiv
 			of bytes to copy. This allows us to have a dynamic */
 		ptr += HEADERSIZE + HEADERSIZEOFFSET;
 
-		int sensoryInformationLength = sizeof(rawData) - (HEADERSIZE + HEADERSIZEOFFSET);
-
-		CmdPacket.Data = new char[sensoryInformationLength];
-
-		memcpy(CmdPacket.Data, ptr, sensoryInformationLength);
-
-		ptr = nullptr;
+		SetBodyData(ptr, sizeof(rawData) - (HEADERSIZE + HEADERSIZEOFFSET));
 	}
+
+	CalcCRC();
+	ptr = nullptr;
 }
 
 void MilestoneOne::PktDef::SetCmd(CmdType newCmdType)
@@ -116,6 +112,8 @@ void MilestoneOne::PktDef::SetBodyData(char* rawData, int bufferLength)
 		ex: DO NOT DO => memcpy(&CmdPacket.Body, ..., ...);
 	*/
 	memcpy(CmdPacket.Data, rawData, bufferLength);
+
+	CmdPacket.Header.Length = HEADERSIZE + bufferLength + sizeof(CmdPacket.CRC);
 }
 
 void MilestoneOne::PktDef::SetPktCount(int newPktCount)
@@ -131,6 +129,7 @@ MilestoneOne::CmdType MilestoneOne::PktDef::GetCmd()
 	else if (CmdPacket.Header.Arm == 1) { return ARM; }
 	else if (CmdPacket.Header.Claw == 1) { return CLAW; }
 	else if (CmdPacket.Header.Ack == 1) { return ACK; }
+	else { return UNSPECIFIED; }
 }
 
 bool MilestoneOne::PktDef::GetAck()
@@ -144,12 +143,7 @@ bool MilestoneOne::PktDef::GetAck()
 
 int MilestoneOne::PktDef::GetLength()
 {
-	/* Assumption: CmdPacket.Body is allocated to a max of 2 bytes (for the struct MotorBody)
-		6 + 1 - 4 + 2 = Expected value of 5 bytes
-		CmdPacket.Header + Tail - 1 Pointer (char* Body) + MotorBody (which is a max of 2 bytes)
-	*/
-
-	return sizeof(MilestoneOne::CmdPacket) + (sizeof(char)*CmdPacket.Header.Length) - 4;
+	return CmdPacket.Header.Length;
 }
 
 char* MilestoneOne::PktDef::GetBodyData()
@@ -165,7 +159,6 @@ int MilestoneOne::PktDef::GetPktCount()
 bool MilestoneOne::PktDef::CheckCRC(char* rawData, int bufferLength)
 {
 	// Assumption: CRC value for the current CmdPacket is initialized
-
 
 	char* ptr = rawData;
 	int counter = 0;
@@ -228,7 +221,7 @@ void MilestoneOne::PktDef::CalcCRC()
 		ptr = CmdPacket.Data;
 
 		// Loop through CmdPacket.Body one byte at a time
-		for (int sean = 0; sean < CmdPacket.Header.Length; sean++)
+		for (int sean = 0; sean < (GetLength() - HEADERSIZE - sizeof(CmdPacket.CRC)); sean++)
 		{
 			for (int maurice = 0; maurice < 8; maurice++)
 			{
@@ -250,8 +243,8 @@ void MilestoneOne::PktDef::CalcCRC()
 
 char* MilestoneOne::PktDef::GenPacket()
 {
-	// Calculate how much memory allocation is required for RawBuffer
-	// GetLength() returns the length of: Header + Body + Tail
+	/* Calculate how much memory allocation is required for RawBuffer
+		GetLength() returns the length of: Header + Body + Tail */
 	int size = GetLength();
 
 	// Allocate memory for data transfer
@@ -265,8 +258,8 @@ char* MilestoneOne::PktDef::GenPacket()
 	ptr += (HEADERSIZE + HEADERSIZEOFFSET);
 
 	// Copying packet body
-	memcpy(ptr, CmdPacket.Data, (sizeof(char)*CmdPacket.Header.Length));
-	ptr += sizeof(char)*CmdPacket.Header.Length;
+	memcpy(ptr, CmdPacket.Data, sizeof(CmdPacket.Data));
+	ptr += sizeof(CmdPacket.Data);
 
 	// Copying packet tail
 	memcpy(ptr, &CmdPacket.CRC, sizeof(uc));
