@@ -11,8 +11,10 @@
 
 MilestoneOne::PktDef::PktDef()
 {
-	/* Constructor inside each structure handles initialization to 0.
-		See CmdPacket.h and CmdPacketHeader.h */
+	/*
+		Constructor inside each structure handles initialization to 0.
+		See CmdPacket.h and CmdPacketHeader.h
+	*/
 	CmdPacket.Header.Length = HEADERSIZE + sizeof(uc);
 	RawBuffer = nullptr;
 }

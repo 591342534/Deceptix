@@ -5,8 +5,8 @@
 	Description:	~ Header file containing all enumerations used for the entire project
 */
 
-#ifndef PROJECT_PKTDEF_ENUMERATIONS_H
-#define PROJECT_PKTDEF_ENUMERATIONS_H
+#ifndef PROJECT_PKTDEF_GLOBALS_H
+#define PROJECT_PKTDEF_GLOBALS_H
 
 /* Global list of typedef aliases found below */
 typedef	unsigned int ui;
