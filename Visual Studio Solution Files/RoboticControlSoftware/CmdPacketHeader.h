@@ -25,7 +25,7 @@ namespace MilestoneOne {
 								also set to 1
 							*/
 		uc Padding : 1;
-		uc Length;			// Contains the TOTAL NUMBER of bytes in the body of the packet
+		uc Length;			// Contains the TOTAL NUMBER of bytes in the ENTIRE packet
 
 		CmdPacketHeader()
 		{

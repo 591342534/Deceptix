@@ -39,7 +39,7 @@ MilestoneOne::PktDef::PktDef(char* rawData)	// Constructor called when we receiv
 			If the SLEEP or ACK flag bit is set to 1, CmdPacket.Body's length will be 0 so don't bother allocating it.
 			Simply calculate the CRC and we're all finished
 		*/
-		CmdPacket.Header.Length = HEADERSIZE + sizeof(CmdPacket.CRC);
+		//CmdPacket.Header.Length = HEADERSIZE + sizeof(CmdPacket.CRC);
 		CmdPacket.Data = nullptr;
 	}
 	else if (CmdPacket.Header.Drive || CmdPacket.Header.Claw || CmdPacket.Header.Arm)
@@ -53,7 +53,7 @@ MilestoneOne::PktDef::PktDef(char* rawData)	// Constructor called when we receiv
 
 		memcpy(&MotorBody, ptr, sizeof(MilestoneOne::MotorBody));
 
-		CmdPacket.Header.Length = HEADERSIZE + sizeof(CmdPacket.Data) + sizeof(CmdPacket.CRC);
+		CmdPacket.Header.Length = HEADERSIZE + sizeof(MilestoneOne::MotorBody) + sizeof(uc);
 
 		// Set the CmdPacket.Data pointer to point to the MotorBody structure that has just been populated
 		CmdPacket.Data = (char*)&MotorBody;
@@ -65,12 +65,12 @@ MilestoneOne::PktDef::PktDef(char* rawData)	// Constructor called when we receiv
 
 		/* Size of the buffer that we're receiving minus CmdPacket.Header will give us the remaining number
 			of bytes to copy. This allows us to have a dynamic */
-		ptr += HEADERSIZE + HEADERSIZEOFFSET;
 
-		int k = sizeof(rawData);
-		int o = (HEADERSIZE + HEADERSIZEOFFSET);
+		ptr += HEADERSIZE;	// Do NOT need HEADERSIZEOFFSET since our rawData is sequential!
 
-		SetBodyData(ptr, sizeof(rawData) - (HEADERSIZE + HEADERSIZEOFFSET));
+		int lengthOfBodyDataToCopy = CmdPacket.Header.Length - HEADERSIZE;
+
+		SetBodyData(ptr, lengthOfBodyDataToCopy);
 	}
 
 	CalcCRC();
