@@ -40,6 +40,8 @@ int main()
 
 	//Testing the PktDef creation interface based on an RxBuffer of RAW Data
 	char buffer[9] = { 0x02, 0x00, 0x00, 0x00, 0x02, 0x09, 0x11, 0x24, 0x08 };
+	cout << sizeof(buffer);
+
 	MilestoneOne::PktDef RxPkt(buffer);
 	cout << "CommandID:  " << RxPkt.GetCmd() << endl;
 	cout << "PktCount:   " << RxPkt.GetPktCount() << endl;

@@ -11,13 +11,14 @@
 #define PROJECT_PKTDEF_H
 
 #include <string.h>
-#include "Enumerations.h"
+#include "Globals.h"
 #include "CmdPacket.h"
 
 namespace MilestoneOne {
 	class PktDef {
 	private:
 		CmdPacket CmdPacket;			// Contains Header, Data and CRC
+		MotorBody MotorBody;			// Contains drive parameter information
 		char* RawBuffer;				// Stores all data in PktDef in a serialized form that is used for transmission over TCP/IP
 	public:
 		PktDef();						// Default constructor that initializes to a safe state
