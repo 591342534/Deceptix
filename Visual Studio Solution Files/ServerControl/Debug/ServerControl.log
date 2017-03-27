@@ -1,0 +1,5 @@
+﻿  Milestone2_Server.cpp
+  MySocket.cpp
+d:\seneca - york\semester 3 courses\btn415 assignments\project\milestonetwo - group 2\mysocket.cpp(14): error C2065: 'Welcome': undeclared identifier
+d:\seneca - york\semester 3 courses\btn415 assignments\project\milestonetwo - group 2\mysocket.cpp(14): error C2143: syntax error: missing ';' before '}'
+  Generating Code...

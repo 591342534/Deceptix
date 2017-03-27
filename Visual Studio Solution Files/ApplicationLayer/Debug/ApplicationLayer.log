@@ -1,0 +1,7 @@
+﻿  PktDef.cpp
+d:\seneca - york\semester 3 courses\btn415 assignments\project\milestonetwo - group 2\applicationlayer\pktdef.cpp(304): warning C4805: '==': unsafe mix of type 'MilestoneOne::CmdType' and type 'bool' in operation
+  Milestone1_BasicValidation.cpp
+  Generating Code...
+d:\seneca - york\semester 3 courses\btn415 assignments\project\milestonetwo - group 2\applicationlayer\pktdef.cpp(173): warning C4715: 'MilestoneOne::PktDef::GetCmd': not all control paths return a value
+  ApplicationLayer.vcxproj -> D:\Seneca - York\Semester 3 Courses\BTN415 Assignments\Project\MilestoneTwo - Group 2\Debug\ApplicationLayer.exe
+  ApplicationLayer.vcxproj -> D:\Seneca - York\Semester 3 Courses\BTN415 Assignments\Project\MilestoneTwo - Group 2\Debug\ApplicationLayer.pdb (Full PDB)

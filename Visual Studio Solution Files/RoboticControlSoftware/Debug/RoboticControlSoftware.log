@@ -1,5 +1,0 @@
-﻿  PktDef.cpp
-c:\users\sean\desktop\version-control\academic projects\robotic_control_software\visual studio solution files\roboticcontrolsoftware\pktdef.cpp(313): warning C4805: '==': unsafe mix of type 'MilestoneOne::CmdType' and type 'bool' in operation
-c:\users\sean\desktop\version-control\academic projects\robotic_control_software\visual studio solution files\roboticcontrolsoftware\pktdef.cpp(174): warning C4715: 'MilestoneOne::PktDef::GetCmd': not all control paths return a value
-  RoboticControlSoftware.vcxproj -> C:\Users\Sean\Desktop\version-control\Academic Projects\Robotic_Control_Software\Visual Studio Solution Files\Debug\RoboticControlSoftware.exe
-  RoboticControlSoftware.vcxproj -> C:\Users\Sean\Desktop\version-control\Academic Projects\Robotic_Control_Software\Visual Studio Solution Files\Debug\RoboticControlSoftware.pdb (Full PDB)
