@@ -14,7 +14,7 @@ MilestoneTwo::MySocket::MySocket()
 
 MilestoneTwo::MySocket::MySocket(SocketType newSocketType, std::string newIPAddr, int newPort, ConnectionType newConnectionType, int bufferLength)
 {
-	// Have fun - Sean
+	// Have fun Stephen
 	Buffer = nullptr;
 }
 
@@ -31,16 +31,22 @@ void MilestoneTwo::MySocket::start_DLLS()
 	//	std::cout << "Could not start DLLs" << std::endl;
 	//	exit(0);
 	//}
+
+	// Have fun Stephen
 }
 
 void MilestoneTwo::MySocket::ConnectTCP()
 {
 	// 3 way handshakes (but I only gots 2 hands)
+
+	// Have fun Stephen
 }
 
 void MilestoneTwo::MySocket::DisconnectTCP()
 {
 	// 4 way handshake (use your legs too)
+
+	// Have fun Stephen
 }
 
 void MilestoneTwo::MySocket::SendData(const char* rawData, int bufferLength)
@@ -53,6 +59,8 @@ void MilestoneTwo::MySocket::SendData(const char* rawData, int bufferLength)
 	{
 		//sendto() for UDP connections
 	}
+
+	// Have fun Hao
 }
 
 int MilestoneTwo::MySocket::GetData(char* rawData)
@@ -75,6 +83,8 @@ void MilestoneTwo::MySocket::SetIPAddr(std::string newIPAddress)
 	{
 		// Aye aye cap'n. Change my IP anyway you want
 	}
+
+	// Have fun Hao
 }
 
 void MilestoneTwo::MySocket::SetPortNo(int newPortNumber)
@@ -98,4 +108,6 @@ void MilestoneTwo::MySocket::SetType(SocketType newSocketType)
 
 	/* What happens if we change from client to server? Do we need to reset/configure
 		anything? Think carefully regarding our SvrAddr_in structure! */
+
+	// Have fun Hao
 }
