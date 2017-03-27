@@ -29,12 +29,25 @@ int main()
 		cout << hex << setw(4) << (unsigned int)*(ptr++) << ", ";
 
 	cout << endl;
-	TestPkt.SetCmd(MilestoneOne::ACK);
+	TestPkt.SetCmd(MilestoneOne::SLEEP);
 	TestPkt.CalcCRC();
 	ptr = TestPkt.GenPacket();
 
 	for (int x = 0; x < (int)TestPkt.GetLength(); x++)
 		cout << hex << setw(4) << (unsigned int)*(ptr++) << ", ";
+
+	cout << endl;
+	cout << endl << noshowbase << dec;
+
+	cout << "CommandID:  " << TestPkt.GetCmd() << endl;
+	cout << "PktCount:   " << TestPkt.GetPktCount() << endl;
+	cout << "Pkt Length: " << TestPkt.GetLength() << endl;
+	cout << "Body Data: " << endl;
+
+	ptr = TestPkt.GetBodyData();
+	cout << showbase << hex;
+	cout << "Byte 1 " << (int)*ptr++ << endl;
+	cout << "Byte 2 " << (int)*ptr << endl;
 
 	cout << endl << noshowbase << dec;
 
@@ -66,9 +79,9 @@ int main()
 	char CRCBadTest[9] = { 0x02, 0x00, 0x00, 0x00, 0x02, 0x09, 0x11, 0x24, 0x17 };
 	Result = RxPkt.CheckCRC(CRCBadTest, 9);
 	if (Result)
-		cout << "CRC Test #1 -- FAILED" << endl;
+		cout << "CRC Test #2 -- FAILED" << endl;
 	else
-		cout << "CRC Test #1 -- PASSED" << endl;
+		cout << "CRC Test #2 -- PASSED" << endl;
 
 	return 1;
 }

@@ -75,7 +75,7 @@ MilestoneOne::PktDef::PktDef(char* rawData)		// Constructor called when we recei
 			The parsed Length of the entire packet minus the HEADERSIZE will give us the remaining amount of bytes to
 			copy for the dynamic body content.
 		*/
-		SetBodyData(ptr, CmdPacket.Header.Length - HEADERSIZE);
+		SetBodyData(ptr, CalculateBodyLength());
 	}
 
 	CalcCRC();
@@ -88,19 +88,49 @@ void MilestoneOne::PktDef::SetCmd(CmdType newCmdType)
 	{
 	case DRIVE:
 		CmdPacket.Header.Drive = 1;
+		CmdPacket.Header.Sleep = 0;
+		CmdPacket.Header.Arm = 0;
+		CmdPacket.Header.Claw = 0;
+		CmdPacket.Header.Ack = 0;
+
+		CmdPacket.Header.Length = 9;
 		break;
 	case SLEEP:
+		CmdPacket.Header.Drive = 0;
 		CmdPacket.Header.Sleep = 1;
+		CmdPacket.Header.Arm = 0;
+		CmdPacket.Header.Claw = 0;
+		CmdPacket.Header.Ack = 0;
+
+		CmdPacket.Header.Length = 7;
 		break;
 	case ARM:
+		CmdPacket.Header.Drive = 0;
+		CmdPacket.Header.Sleep = 0;
 		CmdPacket.Header.Arm = 1;
+		CmdPacket.Header.Claw = 0;
+		CmdPacket.Header.Ack = 0;
+
+		CmdPacket.Header.Length = 9;
 		break;
 	case CLAW:
+		CmdPacket.Header.Drive = 0;
+		CmdPacket.Header.Sleep = 0;
+		CmdPacket.Header.Arm = 0;
 		CmdPacket.Header.Claw = 1;
+		CmdPacket.Header.Ack = 0;
+
+		CmdPacket.Header.Length = 9;
 		break;
 	case ACK:
+		CmdPacket.Header.Drive = 0;
+		CmdPacket.Header.Sleep = 0;
+		CmdPacket.Header.Arm = 0;
+		CmdPacket.Header.Claw = 0;
 		CmdPacket.Header.Ack = 1;
-		// No break necessary unless default has varying logic
+
+		CmdPacket.Header.Length = 7;
+		break;
 	default:
 		break;
 	}
@@ -139,7 +169,8 @@ MilestoneOne::CmdType MilestoneOne::PktDef::GetCmd()
 	else if (CmdPacket.Header.Arm == 1) { return ARM; }
 	else if (CmdPacket.Header.Claw == 1) { return CLAW; }
 	else if (CmdPacket.Header.Ack == 1) { return ACK; }
-	else { return UNSPECIFIED; }
+	else if (CmdPacket.Header.Status == 1) { return STATUS; }
+
 }
 
 bool MilestoneOne::PktDef::GetAck()
@@ -180,7 +211,7 @@ bool MilestoneOne::PktDef::CheckCRC(char* rawData, int bufferLength)
 	int counter = 0;
 
 	// Loop through rawData one byte at a time
-	for (int i = 0; i < bufferLength; i++)
+	for (int i = 0; i < (bufferLength - 1); i++)
 	{
 		// Check one bit at a time
 		for (int j = 0; j < 8; j++)
@@ -195,7 +226,7 @@ bool MilestoneOne::PktDef::CheckCRC(char* rawData, int bufferLength)
 		ptr++;
 	}
 
-	return (counter == CmdPacket.CRC);
+	return (counter == *ptr);
 }
 
 void MilestoneOne::PktDef::CalcCRC()
@@ -278,11 +309,14 @@ char* MilestoneOne::PktDef::GenPacket()
 	// Copying packet header
 	memcpy(ptr, &CmdPacket.Header, HEADERSIZE);
 	ptr += (HEADERSIZE);
+	
+	if (GetCmd() == (DRIVE || CLAW || ARM))
+	{
+		// Copying packet body
+		memcpy(ptr, CmdPacket.Data, CalculateBodyLength());
 
-	// Copying packet body
-	memcpy(ptr, CmdPacket.Data, CalculateBodyLength());
-
-	ptr += CalculateBodyLength();
+		ptr += CalculateBodyLength();
+	}
 
 	// Copying packet tail
 	memcpy(ptr, &CmdPacket.CRC, sizeof(uc));

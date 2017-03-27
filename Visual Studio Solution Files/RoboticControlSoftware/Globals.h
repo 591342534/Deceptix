@@ -15,12 +15,12 @@ typedef unsigned char uc;
 namespace MilestoneOne {
 	enum CmdType				// Enumeration to define the command types for the Robot
 	{
-		UNSPECIFIED = -1,
-		DRIVE,
+		DRIVE = 0,
 		SLEEP,
 		ARM,
 		CLAW,
-		ACK
+		ACK,
+		STATUS
 	};
 
 	// Const integers to define all of the possible commands for the MotorBody structure
