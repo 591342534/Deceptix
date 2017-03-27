@@ -82,7 +82,7 @@ MilestoneOne::PktDef::PktDef(char* rawData)		// Constructor called when we recei
 		inside RawBuffer.
 	*/
 	GenPacket();
-	
+
 	// Verify if the calculated CRC is valid, if not then call the default constructor
 	if (!CheckCRC(RawBuffer, CmdPacket.Header.Length))
 	{
@@ -147,7 +147,7 @@ void MilestoneOne::PktDef::SetBodyData(char* rawData, int bufferLength)
 
 	/*
 		Copy the provided data into the body of CmdPacket
-	
+
 		NOTE: Do NOT copy into the memory location of the pointer
 		itself but the location to which the pointer POINTS TO.
 		ex: DO NOT DO => memcpy(&CmdPacket.Data, ..., ...);
@@ -165,11 +165,13 @@ void MilestoneOne::PktDef::SetPktCount(int newPktCount)
 MilestoneOne::CmdType MilestoneOne::PktDef::GetCmd()
 {
 	// Return the CmdType based on the set flag bit
-	if (CmdPacket.Header.Drive == 1) { return DRIVE; }
-	else if (CmdPacket.Header.Sleep == 1) { return SLEEP; }
-	else if (CmdPacket.Header.Arm == 1) { return ARM; }
-	else if (CmdPacket.Header.Claw == 1) { return CLAW; }
-	else if (CmdPacket.Header.Ack == 1) { return ACK; }
+	if (CmdPacket.Header.Drive) { return DRIVE; }
+	else if (CmdPacket.Header.Sleep) { return SLEEP; }
+	else if (CmdPacket.Header.Arm) { return ARM; }
+	else if (CmdPacket.Header.Claw) { return CLAW; }
+	else if (CmdPacket.Header.Ack) { return ACK; }
+	else if (CmdPacket.Header.Status) { return STATUS; }
+	else { return NACK; }
 }
 
 bool MilestoneOne::PktDef::GetAck()
@@ -300,8 +302,8 @@ char* MilestoneOne::PktDef::GenPacket()
 	// Copying packet header
 	memcpy(ptr, &CmdPacket.Header, HEADERSIZE);
 	ptr += (HEADERSIZE);
-	
-	if (GetCmd() == (DRIVE || CLAW || ARM))
+
+	if ((GetCmd() == DRIVE) || (GetCmd() == CLAW) || (GetCmd() == ARM))
 	{
 		// Copying packet body
 		memcpy(ptr, CmdPacket.Data, CalculateBodyLength());

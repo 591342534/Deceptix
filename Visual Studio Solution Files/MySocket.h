@@ -28,15 +28,16 @@ namespace MilestoneTwo {
 											helps prevent overflows and synchronization issues */
 	public:
 		MySocket();
-		MySocket(SocketType, std::string, ui, ConnectionType, ui);
+		MySocket(SocketType, std::string, int, ConnectionType, int);
 		~MySocket();
+		void start_DLLS();
 		void ConnectTCP();
 		void DisconnectTCP();
 		void SendData(const char*, int);
 		int GetData(char*);
 		std::string GetIPAddr();
 		void SetIPAddr(std::string);
-		void SetPort(int);
+		void SetPortNo(int);
 		int GetPort();
 		SocketType GetType();
 		void SetType(SocketType);

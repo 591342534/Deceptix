@@ -39,7 +39,9 @@ namespace MilestoneOne {
 		SLEEP,
 		ARM,
 		CLAW,
-		ACK
+		ACK,
+		STATUS = 200,
+		NACK = 404
 	};
 
 	// Const integers to define all of the possible commands for the MotorBody structure
