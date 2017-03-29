@@ -1,5 +1,5 @@
 ﻿  Milestone2_Server.cpp
   MySocket.cpp
   Generating Code...
-Milestone2_Server.obj : error LNK2019: unresolved external symbol "public: __thiscall MilestoneTwo::MySocket::MySocket(enum `anonymous namespace'::SocketType,class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >,int,enum A0x079a79f0::ConnectionType,int)" (??0MySocket@MilestoneTwo@@QAE@W4SocketType@?A0x079a79f0@@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@HW4ConnectionType@3@H@Z) referenced in function _main
-C:\Users\Sean\Desktop\version-control\Academic Projects\Robotic_Control_Software\Visual Studio Solution Files\Debug\ServerControl.exe : fatal error LNK1120: 1 unresolved externals
+  ServerControl.vcxproj -> C:\Users\Sean\Desktop\version-control\Academic Projects\Robotic_Control_Software\Visual Studio Solution Files\Debug\ServerControl.exe
+  ServerControl.vcxproj -> C:\Users\Sean\Desktop\version-control\Academic Projects\Robotic_Control_Software\Visual Studio Solution Files\Debug\ServerControl.pdb (Full PDB)

@@ -15,22 +15,19 @@ typedef unsigned char uc;
 #include <string>
 
 /* Default namespace */
-namespace
+enum SocketType
 {
-	enum SocketType
-	{
-		CLIENT = 0,
-		SERVER
-	};
+	CLIENT = 0,
+	SERVER
+};
 
-	enum ConnectionType
-	{
-		TCP = 0,
-		UDP
-	};
+enum ConnectionType
+{
+	TCP = 0,
+	UDP
+};
 
-	const ui DEFAULT_SIZE = 128;
-}
+const ui DEFAULT_SIZE = 128;
 
 namespace MilestoneOne {
 	enum CmdType				// Enumeration to define the command types for the Robot
