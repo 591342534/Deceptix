@@ -54,7 +54,15 @@ MilestoneOne::PktDef::PktDef(char* rawData)		// Constructor called when we recei
 		// Move the pointer by 8 bytes to the beginning of the section inside rawData that contains the MotorBody values
 		ptr += (HEADERSIZE + HEADERSIZEOFFSET);
 
-		SetBodyData(ptr, sizeof(MilestoneOne::MotorBody));
+		MotorBody mb;
+
+		memcpy(&mb.Direction, ptr, sizeof(uc));
+
+		ptr += sizeof(uc);
+
+		memcpy(&mb.Duration, ptr, sizeof(uc));
+
+		SetBodyData(reinterpret_cast<char*>(&mb), sizeof(MilestoneOne::MotorBody));
 	}
 	else if (CmdPacket.Header.Status)
 	{
