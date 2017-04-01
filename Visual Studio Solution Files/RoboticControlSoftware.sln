@@ -9,7 +9,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ClientControl", "ClientCont
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ServerControl", "ServerControl\ServerControl.vcxproj", "{D85035B0-3BDE-4896-9AB9-953802E2A571}"
 	ProjectSection(ProjectDependencies) = postProject
-		{2DE0274D-D0C5-4D3A-B9FF-F2BAB837D8B2} = {2DE0274D-D0C5-4D3A-B9FF-F2BAB837D8B2}
 		{9A695280-FE21-42E2-B04D-2B2BD56E9965} = {9A695280-FE21-42E2-B04D-2B2BD56E9965}
 	EndProjectSection
 EndProject

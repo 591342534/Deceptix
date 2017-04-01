@@ -42,6 +42,7 @@ namespace MilestoneTwo {
 		SocketType GetType();
 		void SetType(SocketType);
 		void SetConnType(ConnectionType);
+		ConnectionType GetConnType();
 	};
 }
 #endif

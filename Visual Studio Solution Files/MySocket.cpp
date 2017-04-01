@@ -9,6 +9,9 @@
 
 MilestoneTwo::MySocket::MySocket(SocketType newSocketType, std::string newIPAddr, int newPort, ConnectionType newConnectionType, int bufferLength)
 {
+	WelcomeSocket = INVALID_SOCKET;
+	ConnectionSocket = INVALID_SOCKET;
+
 	// Utilize member functions to set class variables
 	SetType(newSocketType);				// Sets either Client or Server
 	SetConnType(newConnectionType);		// Sets either TCP or UDP
@@ -20,6 +23,8 @@ MilestoneTwo::MySocket::MySocket(SocketType newSocketType, std::string newIPAddr
 	(bufferLength < 0 ? MaxSize = DEFAULT_SIZE : MaxSize = bufferLength);
 
 	Buffer = new char[MaxSize];
+
+	memset(Buffer, 0, MaxSize);
 
 	// Start the Winsock library for our Socket
 	start_DLLS();
@@ -224,7 +229,7 @@ std::string MilestoneTwo::MySocket::GetIPAddr()
 void MilestoneTwo::MySocket::SetIPAddr(std::string newIPAddress)
 {
 	// Only allow modification of our IP Address if there is NOT a connection already established
-	if (bTCPConnect || WelcomeSocket != INVALID_SOCKET)
+	if (bTCPConnect || (GetType() == SERVER && WelcomeSocket != INVALID_SOCKET))
 	{
 		std::cerr << "Cannot change IP address, connection already established!" << std::endl;
 	}
@@ -236,7 +241,7 @@ void MilestoneTwo::MySocket::SetIPAddr(std::string newIPAddress)
 
 void MilestoneTwo::MySocket::SetPortNo(int newPortNumber)
 {
-	if (bTCPConnect || WelcomeSocket != INVALID_SOCKET)
+	if (bTCPConnect || (GetType() == SERVER && WelcomeSocket != INVALID_SOCKET))
 	{
 		std::cerr << "Cannot change port number, connection already established!" << std::endl;
 	}
@@ -258,7 +263,7 @@ SocketType MilestoneTwo::MySocket::GetType()
 
 void MilestoneTwo::MySocket::SetType(SocketType newSocketType)
 {
-	if (bTCPConnect || WelcomeSocket != INVALID_SOCKET)
+	if (bTCPConnect || (GetType() == SERVER && WelcomeSocket != INVALID_SOCKET))
 	{
 		std::cerr << "Cannot change socket type, connection already established!" << std::endl;
 	}
@@ -270,7 +275,7 @@ void MilestoneTwo::MySocket::SetType(SocketType newSocketType)
 
 void MilestoneTwo::MySocket::SetConnType(ConnectionType newConnType)
 {
-	if (bTCPConnect || WelcomeSocket != INVALID_SOCKET)
+	if (bTCPConnect || (GetType() == SERVER && WelcomeSocket != INVALID_SOCKET))
 	{
 		std::cerr << "Cannot change connection type, connection already established!" << std::endl;
 	}
@@ -278,4 +283,9 @@ void MilestoneTwo::MySocket::SetConnType(ConnectionType newConnType)
 	{
 		connectionType = newConnType;
 	}
+}
+
+ConnectionType MilestoneTwo::MySocket::GetConnType()
+{
+	return connectionType;
 }
