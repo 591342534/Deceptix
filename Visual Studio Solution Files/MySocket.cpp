@@ -114,8 +114,7 @@ void MilestoneTwo::MySocket::ConnectTCP()
 				}
 			}
 		}
-
-		if (mySocket == SERVER)
+		else if (mySocket == SERVER)
 		{
 			WelcomeSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
@@ -164,12 +163,13 @@ void MilestoneTwo::MySocket::ConnectTCP()
 			else
 			{
 				std::cout << "Connection Accepted" << std::endl;
+				bTCPConnect = true;
 			}
 		}
-		else
-		{
-			std::cerr << "Connection type is not TCP! Cannot begin TCP connection!" << std::endl;
-		}
+	}
+	else
+	{
+		std::cerr << "Connection type is not TCP! Cannot begin TCP connection!" << std::endl;
 	}
 }
 

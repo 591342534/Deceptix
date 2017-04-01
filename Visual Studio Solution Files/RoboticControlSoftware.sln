@@ -6,11 +6,11 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ApplicationLayer", "ApplicationLayer\ApplicationLayer.vcxproj", "{2DE0274D-D0C5-4D3A-B9FF-F2BAB837D8B2}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ClientControl", "ClientControl\ClientControl.vcxproj", "{9A695280-FE21-42E2-B04D-2B2BD56E9965}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D85035B0-3BDE-4896-9AB9-953802E2A571} = {D85035B0-3BDE-4896-9AB9-953802E2A571}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ServerControl", "ServerControl\ServerControl.vcxproj", "{D85035B0-3BDE-4896-9AB9-953802E2A571}"
-	ProjectSection(ProjectDependencies) = postProject
-		{9A695280-FE21-42E2-B04D-2B2BD56E9965} = {9A695280-FE21-42E2-B04D-2B2BD56E9965}
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
