@@ -5,7 +5,7 @@ int main()
 {
 	/*MilestoneTwo::MySocket ClientSocket(SocketType::CLIENT, "127.0.0.1", 5000, ConnectionType::TCP, 100);*/
 
-	MilestoneTwo::MySocket ClientSocket(SocketType::CLIENT, "127.0.0.1", 5000, ConnectionType::UDP, 100);
+	MilestoneTwo::MySocket ClientSocket(SocketType::CLIENT, "127.0.0.1", 5000, ConnectionType::TCP, 100);
 
 	std::string Pkt = "I love BTN415";
 

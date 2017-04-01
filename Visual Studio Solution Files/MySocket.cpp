@@ -80,18 +80,18 @@ void MilestoneTwo::MySocket::start_DLLS()
 
 void MilestoneTwo::MySocket::ConnectTCP()
 {
-	// Initialize a Connection socket regardless of Client/Server/TCP or UDP (we ALWAYS need to do it!)
-	ConnectionSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if (ConnectionSocket == INVALID_SOCKET)
-	{
-		WSACleanup();
-		std::cerr << "Could not initialize - INVALID_SOCKET" << std::endl; //let people know of the connection error-hao
-		std::cin.get();
-		exit(0);
-	}
-
 	if (connectionType == TCP)
 	{
+		// Initialize a Connection socket regardless of Client/Server/TCP or UDP (we ALWAYS need to do it!)
+		ConnectionSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+		if (ConnectionSocket == INVALID_SOCKET)
+		{
+			WSACleanup();
+			std::cerr << "Could not initialize - INVALID_SOCKET" << std::endl; //let people know of the connection error-hao
+			std::cin.get();
+			exit(0);
+		}
+
 		if (mySocket == CLIENT)
 		{
 			std::cout << "Trying to connect to the server" << std::endl;
@@ -208,9 +208,10 @@ int MilestoneTwo::MySocket::GetData(char* rawData)
 		memcpy(rawData, Buffer, numOfBytesReceived);
 	}
 	else if (connectionType == UDP) {
-		int addrLen = sizeof(SvrAddr);
-		numOfBytesReceived = recvfrom(ConnectionSocket, Buffer, MaxSize, 0, (struct sockaddr *)&SvrAddr, &addrLen);
-		
+		int addr_len = sizeof(sockaddr);
+
+		numOfBytesReceived = recvfrom(ConnectionSocket, Buffer, MaxSize, 0, (struct sockaddr *)&SvrAddr, &addr_len);
+
 		memcpy(rawData, Buffer, numOfBytesReceived);
 	}
 	else {
@@ -291,5 +292,5 @@ ConnectionType MilestoneTwo::MySocket::GetConnType()
 
 void MilestoneTwo::MySocket::getWSAError()
 {
-	std::cout << WSAGetLastError();
+	std::cout << "Last known error code of: " << WSAGetLastError() << std::endl;
 }
