@@ -3,21 +3,37 @@
 
 int main()
 {
-	/*MilestoneTwo::MySocket ClientSocket(SocketType::CLIENT, "127.0.0.1", 5000, ConnectionType::TCP, 100);*/
+	std::cout << "=== Client ===" << std::endl << std::endl;
 
-	MilestoneTwo::MySocket ClientSocket(SocketType::CLIENT, "127.0.0.1", 5000, ConnectionType::TCP, 100);
+	MilestoneTwo::MySocket TCPClientSocket(SocketType::CLIENT, "127.0.0.1", 5000, ConnectionType::TCP, 100);
 
-	std::string Pkt = "I love BTN415";
+	std::string TCPPkt = "I love BTN415 - Sent by TCP Client";
 
-	ClientSocket.ConnectTCP();
-	ClientSocket.SendData(Pkt.c_str(), strlen(Pkt.c_str())+1);
+	TCPClientSocket.ConnectTCP();
+	TCPClientSocket.SendData(TCPPkt.c_str(), strlen(TCPPkt.c_str())+1);
 
 	char buff[100];
-	int RxSize = ClientSocket.GetData(buff);
+	int RxSize = TCPClientSocket.GetData(buff);
 
 	std::cout << "Msg = " << buff << ", Bytes = " << RxSize << std::endl;
 
-	ClientSocket.DisconnectTCP();
+	TCPClientSocket.DisconnectTCP();
+
+	memset(buff, 0, sizeof(buff));
+	RxSize = 0;
+
+	MilestoneTwo::MySocket UDPClientSocket(SocketType::CLIENT, "127.0.0.1", 9001, ConnectionType::UDP, 100);
+
+	std::string UDPPkt = "I love BTN415 - Sent by UDP Client";
+
+	UDPClientSocket.ConnectTCP();	// Should not work!
+	UDPClientSocket.SendData(UDPPkt.c_str(), strlen(UDPPkt.c_str()) + 1);
+
+	RxSize = UDPClientSocket.GetData(buff);
+
+	std::cout << "Msg = " << buff << ", Bytes = " << RxSize << std::endl;
+
+	std::cin.get();
 
 	return 1;
 }

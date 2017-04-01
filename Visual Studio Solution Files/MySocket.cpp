@@ -7,6 +7,8 @@
 
 #include "MySocket.h"
 
+/* Constructor that configures the socket and connection types as well as IP Address and Port number
+	as well as dynamically allocating memory for the receiving buffer. Servers are setup accordingly. */
 MilestoneTwo::MySocket::MySocket(SocketType newSocketType, std::string newIPAddr, int newPort, ConnectionType newConnectionType, int bufferLength)
 {
 	WelcomeSocket = INVALID_SOCKET;
@@ -35,12 +37,12 @@ MilestoneTwo::MySocket::MySocket(SocketType newSocketType, std::string newIPAddr
 	}
 	else if (connectionType == UDP)
 	{
-		 // DO NOT initialize WelcomeSocket - that is used for TCP connections only!
+		// DO NOT initialize WelcomeSocket - that is used for TCP connections only!
 		ConnectionSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 		if (ConnectionSocket == INVALID_SOCKET)
 		{
 			WSACleanup();
-			std::cerr << "Could not initialize - INVALID_SOCKET" << std::endl; 
+			std::cerr << "Could not initialize - INVALID_SOCKET" << std::endl;
 			std::cin.get();
 			exit(0);
 		}
@@ -63,12 +65,14 @@ MilestoneTwo::MySocket::MySocket(SocketType newSocketType, std::string newIPAddr
 	}
 }
 
+// Destructor to deallocate dynamic data
 MilestoneTwo::MySocket::~MySocket()
 {
 	delete[] Buffer;
 	Buffer = nullptr;
 }
 
+// Boots up the Windows socket libraries (to use functions like send, recv etc)
 void MilestoneTwo::MySocket::start_DLLS()
 {
 	WSADATA wsaData;
@@ -78,6 +82,7 @@ void MilestoneTwo::MySocket::start_DLLS()
 	}
 }
 
+// Function used to establish a TCP/IP socket connection via a 3-way handshake
 void MilestoneTwo::MySocket::ConnectTCP()
 {
 	if (connectionType == TCP)
@@ -87,7 +92,7 @@ void MilestoneTwo::MySocket::ConnectTCP()
 		if (ConnectionSocket == INVALID_SOCKET)
 		{
 			WSACleanup();
-			std::cerr << "Could not initialize - INVALID_SOCKET" << std::endl; //let people know of the connection error-hao
+			std::cerr << "Could not initialize - INVALID_SOCKET" << std::endl;
 			std::cin.get();
 			exit(0);
 		}
@@ -149,7 +154,7 @@ void MilestoneTwo::MySocket::ConnectTCP()
 			{
 				std::cout << "Waiting for client connection..." << std::endl;
 			}
-			
+
 			// NOTE: We must set the ConnectionSocket equal to the ServerSocket
 			if ((this->ConnectionSocket = accept(this->WelcomeSocket, NULL, NULL)) == SOCKET_ERROR)
 			{
@@ -168,20 +173,27 @@ void MilestoneTwo::MySocket::ConnectTCP()
 	}
 	else
 	{
-		std::cerr << "Connection type is not TCP! Cannot begin TCP connection!" << std::endl;
+		std::cerr << "Connection type is not of TCP! Cannot perform a TCP connection!" << std::endl;
 	}
 }
 
+// Function used to disconnect an established TCP/IP socket connection via a 4-way handshake
 void MilestoneTwo::MySocket::DisconnectTCP()
 {
-	if (mySocket == SERVER) { closesocket(WelcomeSocket); }
-	
-	closesocket(ConnectionSocket);
-	
-	// Free Winsock DLL resources
-	WSACleanup();
+	if (bTCPConnect)
+	{
+		if (mySocket == SERVER) { closesocket(WelcomeSocket); }
+
+		closesocket(ConnectionSocket);
+		
+		bTCPConnect = false;
+
+		// Free Winsock DLL resources
+		WSACleanup();
+	}
 }
 
+// Function used to transmit a block of RAW data - works with both TCP and UDP
 void MilestoneTwo::MySocket::SendData(const char* rawData, int bufferLength)
 {
 	if (connectionType == TCP)
@@ -195,7 +207,61 @@ void MilestoneTwo::MySocket::SendData(const char* rawData, int bufferLength)
 	}
 }
 
-//Receive the last block of RAW data stored in the internal MySocket Buffer
+// Sets an IP Address - contains logic to prevent changes being made if a TCP/IP connection has been established or Welcome socket is open
+void MilestoneTwo::MySocket::SetIPAddr(std::string newIPAddress)
+{
+	// Only allow modification of our IP Address if there is NOT a connection already established
+	if (bTCPConnect || (GetType() == SERVER && WelcomeSocket != INVALID_SOCKET))
+	{
+		std::cerr << "Cannot change IP address, connection already established!" << std::endl;
+	}
+	else
+	{
+		IPAddr = newIPAddress;
+	}
+}
+
+// Sets a Port number - contains logic to prevent changes being made if a TCP/IP connection has been established or Welcome socket is open
+void MilestoneTwo::MySocket::SetPortNo(int newPortNumber)
+{
+	if (bTCPConnect || (GetType() == SERVER && WelcomeSocket != INVALID_SOCKET))
+	{
+		std::cerr << "Cannot change port number, connection already established!" << std::endl;
+	}
+	else
+	{
+		Port = newPortNumber;
+	}
+}
+
+// Sets a Socket Type - contains logic to prevent changes being made if a TCP/IP connection has been established or Welcome socket is open
+void MilestoneTwo::MySocket::SetType(SocketType newSocketType)
+{
+	if (bTCPConnect || (GetType() == SERVER && WelcomeSocket != INVALID_SOCKET))
+	{
+		std::cerr << "Cannot change socket type, connection already established!" << std::endl;
+	}
+	else
+	{
+		mySocket = newSocketType;
+	}
+}
+
+// Sets a Connection Type - contains logic to prevent changes being made if a TCP/IP connection has 
+void MilestoneTwo::MySocket::SetConnType(ConnectionType newConnType)
+{
+	if (bTCPConnect || (GetType() == SERVER && WelcomeSocket != INVALID_SOCKET))
+	{
+		std::cerr << "Cannot change connection type, connection already established!" << std::endl;
+	}
+	else
+	{
+		connectionType = newConnType;
+	}
+}
+
+/* Function used to receive data on the internal buffer then copy it to the argument buffer.
+	Works with both TCP and UDP. */
 int MilestoneTwo::MySocket::GetData(char* rawData)
 {
 	int numOfBytesReceived = 0;
@@ -226,31 +292,6 @@ std::string MilestoneTwo::MySocket::GetIPAddr()
 	return IPAddr;
 }
 
-void MilestoneTwo::MySocket::SetIPAddr(std::string newIPAddress)
-{
-	// Only allow modification of our IP Address if there is NOT a connection already established
-	if (bTCPConnect || (GetType() == SERVER && WelcomeSocket != INVALID_SOCKET))
-	{
-		std::cerr << "Cannot change IP address, connection already established!" << std::endl;
-	}
-	else
-	{
-		IPAddr = newIPAddress;
-	}
-}
-
-void MilestoneTwo::MySocket::SetPortNo(int newPortNumber)
-{
-	if (bTCPConnect || (GetType() == SERVER && WelcomeSocket != INVALID_SOCKET))
-	{
-		std::cerr << "Cannot change port number, connection already established!" << std::endl;
-	}
-	else
-	{
-		Port = newPortNumber;
-	}
-}
-
 int MilestoneTwo::MySocket::GetPort()
 {
 	return Port;
@@ -261,35 +302,12 @@ SocketType MilestoneTwo::MySocket::GetType()
 	return mySocket;
 }
 
-void MilestoneTwo::MySocket::SetType(SocketType newSocketType)
-{
-	if (bTCPConnect || (GetType() == SERVER && WelcomeSocket != INVALID_SOCKET))
-	{
-		std::cerr << "Cannot change socket type, connection already established!" << std::endl;
-	}
-	else
-	{
-		mySocket = newSocketType;
-	}
-}
-
-void MilestoneTwo::MySocket::SetConnType(ConnectionType newConnType)
-{
-	if (bTCPConnect || (GetType() == SERVER && WelcomeSocket != INVALID_SOCKET))
-	{
-		std::cerr << "Cannot change connection type, connection already established!" << std::endl;
-	}
-	else
-	{
-		connectionType = newConnType;
-	}
-}
-
 ConnectionType MilestoneTwo::MySocket::GetConnType()
 {
 	return connectionType;
 }
 
+// Function used during debugging to display error codes from functions like send(), recv(), sendto() and recvfrom()
 void MilestoneTwo::MySocket::getWSAError()
 {
 	std::cout << "Last known error code of: " << WSAGetLastError() << std::endl;
