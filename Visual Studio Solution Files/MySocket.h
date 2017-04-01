@@ -10,6 +10,7 @@
 
 #include "./ApplicationLayer/Globals.h"
 #include <iostream>
+#include <thread>
 #include <windows.networking.sockets.h>
 #pragma comment(lib, "Ws2_32.lib")
 
@@ -17,7 +18,7 @@ namespace MilestoneTwo {
 	class MySocket {
 	private:
 		char* Buffer;					// RAW buffer space for communication activities
-		SOCKET WelcomeSocket;			// Used by a MySocket object configured as a TCP/IP SERVER
+		SOCKET ServerSocket;			// Used by a MySocket object configured as a TCP/IP SERVER
 		SOCKET ConnectionSocket;		// Used for client/server communications (Both TCP and UDP)
 		struct sockaddr_in SvrAddr;		// Stores connection information
 		SocketType mySocket;			// Holds the type of socket that the MySocket object is initialized to
