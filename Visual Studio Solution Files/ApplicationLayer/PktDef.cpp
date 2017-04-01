@@ -331,6 +331,7 @@ char* MilestoneOne::PktDef::GenPacket()
 
 MilestoneOne::PktDef::~PktDef()
 {
-	delete RawBuffer;
+	// Need to use delete[] if the "new" keyword is used!
+	delete[] RawBuffer;
 	RawBuffer = nullptr;
 }

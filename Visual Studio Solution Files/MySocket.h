@@ -28,7 +28,6 @@ namespace MilestoneTwo {
 		int MaxSize;					/* Stores the maximum number of bytes the buffer is allocated to -
 											helps prevent overflows and synchronization issues */
 	public:
-		MySocket();
 		MySocket(SocketType, std::string, int, ConnectionType, int);
 		~MySocket();
 		void start_DLLS();
@@ -42,6 +41,7 @@ namespace MilestoneTwo {
 		int GetPort();
 		SocketType GetType();
 		void SetType(SocketType);
+		void SetConnType(ConnectionType);
 	};
 }
 #endif

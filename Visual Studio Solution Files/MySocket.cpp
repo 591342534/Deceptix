@@ -7,57 +7,83 @@
 
 #include "MySocket.h"
 
-MilestoneTwo::MySocket::MySocket()
-{
-	Buffer = nullptr;
-}
-
 MilestoneTwo::MySocket::MySocket(SocketType newSocketType, std::string newIPAddr, int newPort, ConnectionType newConnectionType, int bufferLength)
 {
-	mySocket = newSocketType;
-	Port = newPort;
-	IPAddr = newIPAddr;
-	connectionType = newConnectionType;
-	MaxSize = bufferLength;
-	Buffer = nullptr;
-	//Connect
-	if (connectionType == TCP)
+	// Utilize member functions to set class variables
+	SetType(newSocketType);				// Sets either Client or Server
+	SetConnType(newConnectionType);		// Sets either TCP or UDP
+	SetPortNo(newPort);
+	SetIPAddr(newIPAddr);
+
+	/* Is the passed in Buffer size less than zero (aka a negative)? If so, resort
+		to using the DEFAULT_SIZE of 128 bytes, otherwise use the parameter */
+	(bufferLength < 0 ? MaxSize = DEFAULT_SIZE : MaxSize = bufferLength);
+
+	Buffer = new char[MaxSize];
+
+	// Start the Winsock library for our Socket
+	start_DLLS();
+
+	if (connectionType == TCP && mySocket == SERVER)
 	{
-		start_DLLS();
 		ConnectTCP();
+	}
+	else if (connectionType == UDP && mySocket == SERVER)
+	{
+		 // DO NOT initialize WelcomeSocket - that is used for TCP connections only!
+		ConnectionSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+		if (ConnectionSocket == INVALID_SOCKET)
+		{
+			WSACleanup();
+			std::cerr << "Could not initialize - INVALID_SOCKET" << std::endl; 
+			std::cin.get();
+			exit(0);
+		}
+
+		SvrAddr.sin_family = AF_INET;
+		SvrAddr.sin_port = htons(this->Port);
+		SvrAddr.sin_addr.s_addr = inet_addr(this->IPAddr.c_str());
+
+		if ((bind(this->ConnectionSocket, (struct sockaddr *)&SvrAddr, sizeof(SvrAddr))) == SOCKET_ERROR)
+		{
+			closesocket(this->ConnectionSocket);
+			WSACleanup();
+			std::cerr << "Error while attempting to bind the Server socket" << std::endl;
+			std::cin.get();
+			exit(0);
+		}
 	}
 }
 
 MilestoneTwo::MySocket::~MySocket()
 {
-	delete Buffer;
+	delete[] Buffer;
 	Buffer = nullptr;
 }
 
-// Start the Windows DLL (Dynamic Linked Library) for Winsock
 void MilestoneTwo::MySocket::start_DLLS()
 {
 	WSADATA wsaData;
 	if ((WSAStartup(MAKEWORD(2, 2), &wsaData)) != 0) {
-		std::cout << "Could not start DLLs" << std::endl;
+		std::cerr << "Could not start DLLs" << std::endl;
 		exit(0);
 	}
 }
 
 void MilestoneTwo::MySocket::ConnectTCP()
 {
-	//Initialize
-	ConnectionSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if (ConnectionSocket == INVALID_SOCKET)
-	{
-		WSACleanup();
-		exit(0);
-	}
-	// 3 way handshakes (but I only gots 2 hands)
-	//3 way handshake for Connection Socket
 	if (connectionType == TCP)
 	{
-		//Client
+		// Initialize a Connection socket regardless of Client/Server/TCP or UDP (we ALWAYS need to do it!)
+		ConnectionSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+		if (ConnectionSocket == INVALID_SOCKET)
+		{
+			WSACleanup();
+			std::cerr << "Could not initialize - INVALID_SOCKET" << std::endl; //let people know of the connection error-hao
+			std::cin.get();
+			exit(0);
+		}
+
 		if (mySocket == CLIENT)
 		{
 			std::cout << "Trying to connect to the server" << std::endl;
@@ -66,13 +92,14 @@ void MilestoneTwo::MySocket::ConnectTCP()
 			SvrAddr.sin_family = AF_INET;
 			SvrAddr.sin_port = htons(this->Port);
 			SvrAddr.sin_addr.s_addr = inet_addr(this->IPAddr.c_str());
-			while (!bTCPConnect)
+
+			if (!bTCPConnect) // Does connect always wait for us?
 			{
 				if ((connect(this->ConnectionSocket, (struct sockaddr *)&SvrAddr, sizeof(SvrAddr))) == SOCKET_ERROR)
 				{
 					closesocket(this->ConnectionSocket);
 					WSACleanup();
-					std::cout << "Could not connect to the server" << std::endl;
+					std::cerr << "Could not connect to the server" << std::endl;
 					std::cin.get();
 					exit(0);
 				}
@@ -81,28 +108,38 @@ void MilestoneTwo::MySocket::ConnectTCP()
 					bTCPConnect = true;
 				}
 			}
-		}//if CLIENT CONNECTION
-		 //SERVER
+		}
+
 		if (mySocket == SERVER)
 		{
-			SvrAddr.sin_family = AF_INET;
-			SvrAddr.sin_port = htons(this->Port);
-			SvrAddr.sin_addr.s_addr = inet_addr(this->IPAddr.c_str());
-			//Bind
-			if ((bind(this->ConnectionSocket, (struct sockaddr *)&SvrAddr, sizeof(SvrAddr))) == SOCKET_ERROR)
+			WelcomeSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+			if (WelcomeSocket == INVALID_SOCKET)
 			{
-				closesocket(this->ConnectionSocket);
 				WSACleanup();
-				std::cout << "Could not connect to the server" << std::endl;
+				std::cerr << "Could not initialize - INVALID_SOCKET" << std::endl;
 				std::cin.get();
 				exit(0);
 			}
-			//listen
-			if (listen(this->ConnectionSocket, 1) == SOCKET_ERROR)
+
+			SvrAddr.sin_family = AF_INET;
+			SvrAddr.sin_port = htons(this->Port);
+			SvrAddr.sin_addr.s_addr = inet_addr(this->IPAddr.c_str());
+
+			if ((bind(this->WelcomeSocket, (struct sockaddr *)&SvrAddr, sizeof(SvrAddr))) == SOCKET_ERROR)
 			{
-				closesocket(this->ConnectionSocket);
+				closesocket(this->WelcomeSocket);
 				WSACleanup();
-				std::cout << "Could not listen to the provided socket." << std::endl;
+				std::cerr << "Could not connect to the server" << std::endl;
+				std::cin.get();
+				exit(0);
+			}
+
+			if (listen(this->WelcomeSocket, 1) == SOCKET_ERROR)
+			{
+				closesocket(this->WelcomeSocket);
+				WSACleanup();
+				std::cerr << "Could not listen to the provided socket" << std::endl;
 				std::cin.get();
 				exit(0);
 			}
@@ -110,12 +147,12 @@ void MilestoneTwo::MySocket::ConnectTCP()
 			{
 				std::cout << "Waiting for client connection..." << std::endl;
 			}
-			//Accept
-			if ((this->ConnectionSocket = accept(this->ConnectionSocket, NULL, NULL)) == SOCKET_ERROR)
+			
+			if ((this->WelcomeSocket = accept(this->WelcomeSocket, NULL, NULL)) == SOCKET_ERROR)
 			{
-				closesocket(this->ConnectionSocket);
+				closesocket(this->WelcomeSocket);
 				WSACleanup();
-				std::cout << "Could not accept incoming connection." << std::endl;
+				std::cerr << "Could not accept incoming connection" << std::endl;
 				std::cin.get();
 				exit(0);
 			}
@@ -123,35 +160,60 @@ void MilestoneTwo::MySocket::ConnectTCP()
 			{
 				std::cout << "Connection Accepted" << std::endl;
 			}
-		}//If SERVER
-
+		}
+		else
+		{
+			std::cerr << "Connection type is not TCP! Cannot begin TCP connection!" << std::endl;
+		}
 	}
 }
 
 void MilestoneTwo::MySocket::DisconnectTCP()
 {
-	//4 way handshake Connection Socket
-	closesocket(ConnectionSocket); //closes connection and socket
-	WSACleanup(); //frees Winsock DLL resources
+	if (mySocket == SERVER) { closesocket(WelcomeSocket); }
+	
+	closesocket(ConnectionSocket);
+	
+	// Free Winsock DLL resources
+	WSACleanup();
 }
 
 void MilestoneTwo::MySocket::SendData(const char* rawData, int bufferLength)
 {
 	if (connectionType == TCP)
 	{
-		//send() for TCP connections
+		send(ConnectionSocket, rawData, bufferLength, 0);
 	}
 	else if (connectionType == UDP)
 	{
-		//sendto() for UDP connections
+		// ASSUMPTION: SvrAddr has been set properly beforehand
+		sendto(ConnectionSocket, rawData, bufferLength, 0, (struct sockaddr*)&SvrAddr, sizeof(SvrAddr));
 	}
-
-	// Have fun Hao
 }
 
+//Receive the last block of RAW data stored in the internal MySocket Buffer
 int MilestoneTwo::MySocket::GetData(char* rawData)
 {
-	return 0;
+	int numOfBytesReceived = 0;
+	memset(Buffer, 0, MaxSize);
+
+	// Check for TCP/UDP connection type before receiving
+	if (connectionType == TCP) {
+		numOfBytesReceived = recv(ConnectionSocket, Buffer, MaxSize, 0);
+
+		memcpy(rawData, Buffer, numOfBytesReceived);
+	}
+	else if (connectionType == UDP) {
+		int addrLen = sizeof(SvrAddr);
+		numOfBytesReceived = recvfrom(ConnectionSocket, Buffer, MaxSize, 0, (struct sockaddr *)&SvrAddr, &addrLen);
+		
+		memcpy(rawData, Buffer, numOfBytesReceived);
+	}
+	else {
+		std::cerr << "Invalid connection type, cannot receive incoming data!" << std::endl;
+	}
+
+	return numOfBytesReceived;
 }
 
 std::string MilestoneTwo::MySocket::GetIPAddr()
@@ -161,21 +223,27 @@ std::string MilestoneTwo::MySocket::GetIPAddr()
 
 void MilestoneTwo::MySocket::SetIPAddr(std::string newIPAddress)
 {
-	if (bTCPConnect)
+	// Only allow modification of our IP Address if there is NOT a connection already established
+	if (bTCPConnect || WelcomeSocket != INVALID_SOCKET)
 	{
-		// Whatchu tryin to do changing my IP all up in here?
+		std::cerr << "Cannot change IP address, connection already established!" << std::endl;
 	}
 	else
 	{
-		// Aye aye cap'n. Change my IP anyway you want
+		IPAddr = newIPAddress;
 	}
-
-	// Have fun Hao
 }
 
 void MilestoneTwo::MySocket::SetPortNo(int newPortNumber)
 {
-	Port = newPortNumber;
+	if (bTCPConnect || WelcomeSocket != INVALID_SOCKET)
+	{
+		std::cerr << "Cannot change port number, connection already established!" << std::endl;
+	}
+	else
+	{
+		Port = newPortNumber;
+	}
 }
 
 int MilestoneTwo::MySocket::GetPort()
@@ -190,10 +258,24 @@ SocketType MilestoneTwo::MySocket::GetType()
 
 void MilestoneTwo::MySocket::SetType(SocketType newSocketType)
 {
-	mySocket = newSocketType;
+	if (bTCPConnect || WelcomeSocket != INVALID_SOCKET)
+	{
+		std::cerr << "Cannot change socket type, connection already established!" << std::endl;
+	}
+	else
+	{
+		mySocket = newSocketType;
+	}
+}
 
-	/* What happens if we change from client to server? Do we need to reset/configure
-		anything? Think carefully regarding our SvrAddr_in structure! */
-
-	// Have fun Hao
+void MilestoneTwo::MySocket::SetConnType(ConnectionType newConnType)
+{
+	if (bTCPConnect || WelcomeSocket != INVALID_SOCKET)
+	{
+		std::cerr << "Cannot change connection type, connection already established!" << std::endl;
+	}
+	else
+	{
+		connectionType = newConnType;
+	}
 }
