@@ -3,7 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RoboticControlSoftware", "RoboticControlSoftware\RoboticControlSoftware.vcxproj", "{2DE0274D-D0C5-4D3A-B9FF-F2BAB837D8B2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ApplicationLayer", "ApplicationLayer\ApplicationLayer.vcxproj", "{2DE0274D-D0C5-4D3A-B9FF-F2BAB837D8B2}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ClientControl", "ClientControl\ClientControl.vcxproj", "{9A695280-FE21-42E2-B04D-2B2BD56E9965}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D85035B0-3BDE-4896-9AB9-953802E2A571} = {D85035B0-3BDE-4896-9AB9-953802E2A571}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ServerControl", "ServerControl\ServerControl.vcxproj", "{D85035B0-3BDE-4896-9AB9-953802E2A571}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +28,22 @@ Global
 		{2DE0274D-D0C5-4D3A-B9FF-F2BAB837D8B2}.Release|x64.Build.0 = Release|x64
 		{2DE0274D-D0C5-4D3A-B9FF-F2BAB837D8B2}.Release|x86.ActiveCfg = Release|Win32
 		{2DE0274D-D0C5-4D3A-B9FF-F2BAB837D8B2}.Release|x86.Build.0 = Release|Win32
+		{9A695280-FE21-42E2-B04D-2B2BD56E9965}.Debug|x64.ActiveCfg = Debug|x64
+		{9A695280-FE21-42E2-B04D-2B2BD56E9965}.Debug|x64.Build.0 = Debug|x64
+		{9A695280-FE21-42E2-B04D-2B2BD56E9965}.Debug|x86.ActiveCfg = Debug|Win32
+		{9A695280-FE21-42E2-B04D-2B2BD56E9965}.Debug|x86.Build.0 = Debug|Win32
+		{9A695280-FE21-42E2-B04D-2B2BD56E9965}.Release|x64.ActiveCfg = Release|x64
+		{9A695280-FE21-42E2-B04D-2B2BD56E9965}.Release|x64.Build.0 = Release|x64
+		{9A695280-FE21-42E2-B04D-2B2BD56E9965}.Release|x86.ActiveCfg = Release|Win32
+		{9A695280-FE21-42E2-B04D-2B2BD56E9965}.Release|x86.Build.0 = Release|Win32
+		{D85035B0-3BDE-4896-9AB9-953802E2A571}.Debug|x64.ActiveCfg = Debug|x64
+		{D85035B0-3BDE-4896-9AB9-953802E2A571}.Debug|x64.Build.0 = Debug|x64
+		{D85035B0-3BDE-4896-9AB9-953802E2A571}.Debug|x86.ActiveCfg = Debug|Win32
+		{D85035B0-3BDE-4896-9AB9-953802E2A571}.Debug|x86.Build.0 = Debug|Win32
+		{D85035B0-3BDE-4896-9AB9-953802E2A571}.Release|x64.ActiveCfg = Release|x64
+		{D85035B0-3BDE-4896-9AB9-953802E2A571}.Release|x64.Build.0 = Release|x64
+		{D85035B0-3BDE-4896-9AB9-953802E2A571}.Release|x86.ActiveCfg = Release|Win32
+		{D85035B0-3BDE-4896-9AB9-953802E2A571}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
