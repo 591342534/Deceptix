@@ -9,7 +9,7 @@
 
 MilestoneTwo::MySocket::MySocket(SocketType newSocketType, std::string newIPAddr, int newPort, ConnectionType newConnectionType, int bufferLength)
 {
-	ServerSocket = INVALID_SOCKET;
+	WelcomeSocket = INVALID_SOCKET;
 	ConnectionSocket = INVALID_SOCKET;
 
 	// Utilize member functions to set class variables
@@ -33,7 +33,7 @@ MilestoneTwo::MySocket::MySocket(SocketType newSocketType, std::string newIPAddr
 	{
 		ConnectTCP();
 	}
-	else if (connectionType == UDP && mySocket == SERVER)
+	else if (connectionType == UDP)
 	{
 		 // DO NOT initialize WelcomeSocket - that is used for TCP connections only!
 		ConnectionSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -49,13 +49,16 @@ MilestoneTwo::MySocket::MySocket(SocketType newSocketType, std::string newIPAddr
 		SvrAddr.sin_port = htons(this->Port);
 		SvrAddr.sin_addr.s_addr = inet_addr(this->IPAddr.c_str());
 
-		if ((bind(this->ConnectionSocket, (struct sockaddr *)&SvrAddr, sizeof(SvrAddr))) == SOCKET_ERROR)
+		if (mySocket == SERVER)
 		{
-			closesocket(this->ConnectionSocket);
-			WSACleanup();
-			std::cerr << "Error while attempting to bind the Server socket" << std::endl;
-			std::cin.get();
-			exit(0);
+			if ((bind(this->ConnectionSocket, (struct sockaddr *)&SvrAddr, sizeof(SvrAddr))) == SOCKET_ERROR)
+			{
+				closesocket(this->ConnectionSocket);
+				WSACleanup();
+				std::cerr << "Error while attempting to bind the Server socket" << std::endl;
+				std::cin.get();
+				exit(0);
+			}
 		}
 	}
 }
@@ -77,18 +80,18 @@ void MilestoneTwo::MySocket::start_DLLS()
 
 void MilestoneTwo::MySocket::ConnectTCP()
 {
+	// Initialize a Connection socket regardless of Client/Server/TCP or UDP (we ALWAYS need to do it!)
+	ConnectionSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	if (ConnectionSocket == INVALID_SOCKET)
+	{
+		WSACleanup();
+		std::cerr << "Could not initialize - INVALID_SOCKET" << std::endl; //let people know of the connection error-hao
+		std::cin.get();
+		exit(0);
+	}
+
 	if (connectionType == TCP)
 	{
-		// Initialize a Connection socket regardless of Client/Server/TCP or UDP (we ALWAYS need to do it!)
-		ConnectionSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-		if (ConnectionSocket == INVALID_SOCKET)
-		{
-			WSACleanup();
-			std::cerr << "Could not initialize - INVALID_SOCKET" << std::endl; //let people know of the connection error-hao
-			std::cin.get();
-			exit(0);
-		}
-
 		if (mySocket == CLIENT)
 		{
 			std::cout << "Trying to connect to the server" << std::endl;
@@ -111,9 +114,9 @@ void MilestoneTwo::MySocket::ConnectTCP()
 		}
 		else if (mySocket == SERVER)
 		{
-			ServerSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+			WelcomeSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-			if (ServerSocket == INVALID_SOCKET)
+			if (WelcomeSocket == INVALID_SOCKET)
 			{
 				WSACleanup();
 				std::cerr << "Could not initialize WelcomeSocket" << std::endl;
@@ -125,18 +128,18 @@ void MilestoneTwo::MySocket::ConnectTCP()
 			SvrAddr.sin_port = htons(this->Port);
 			SvrAddr.sin_addr.s_addr = inet_addr(this->IPAddr.c_str());
 
-			if ((bind(this->ServerSocket, (struct sockaddr *)&SvrAddr, sizeof(SvrAddr))) == SOCKET_ERROR)
+			if ((bind(this->WelcomeSocket, (struct sockaddr *)&SvrAddr, sizeof(SvrAddr))) == SOCKET_ERROR)
 			{
-				closesocket(this->ServerSocket);
+				closesocket(this->WelcomeSocket);
 				WSACleanup();
 				std::cerr << "Could bind the server's WelcomeSocket" << std::endl;
 				std::cin.get();
 				exit(0);
 			}
 
-			if (listen(this->ServerSocket, 1) == SOCKET_ERROR)
+			if (listen(this->WelcomeSocket, 1) == SOCKET_ERROR)
 			{
-				closesocket(this->ServerSocket);
+				closesocket(this->WelcomeSocket);
 				WSACleanup();
 				std::cerr << "Could not listen to the provided socket" << std::endl;
 				std::cin.get();
@@ -148,9 +151,9 @@ void MilestoneTwo::MySocket::ConnectTCP()
 			}
 			
 			// NOTE: We must set the ConnectionSocket equal to the ServerSocket
-			if ((this->ConnectionSocket = accept(this->ServerSocket, NULL, NULL)) == SOCKET_ERROR)
+			if ((this->ConnectionSocket = accept(this->WelcomeSocket, NULL, NULL)) == SOCKET_ERROR)
 			{
-				closesocket(this->ServerSocket);
+				closesocket(this->WelcomeSocket);
 				WSACleanup();
 				std::cerr << "Could not accept incoming connection" << std::endl;
 				std::cin.get();
@@ -171,7 +174,7 @@ void MilestoneTwo::MySocket::ConnectTCP()
 
 void MilestoneTwo::MySocket::DisconnectTCP()
 {
-	if (mySocket == SERVER) { closesocket(ServerSocket); }
+	if (mySocket == SERVER) { closesocket(WelcomeSocket); }
 	
 	closesocket(ConnectionSocket);
 	
@@ -225,7 +228,7 @@ std::string MilestoneTwo::MySocket::GetIPAddr()
 void MilestoneTwo::MySocket::SetIPAddr(std::string newIPAddress)
 {
 	// Only allow modification of our IP Address if there is NOT a connection already established
-	if (bTCPConnect || (GetType() == SERVER && ServerSocket != INVALID_SOCKET))
+	if (bTCPConnect || (GetType() == SERVER && WelcomeSocket != INVALID_SOCKET))
 	{
 		std::cerr << "Cannot change IP address, connection already established!" << std::endl;
 	}
@@ -237,7 +240,7 @@ void MilestoneTwo::MySocket::SetIPAddr(std::string newIPAddress)
 
 void MilestoneTwo::MySocket::SetPortNo(int newPortNumber)
 {
-	if (bTCPConnect || (GetType() == SERVER && ServerSocket != INVALID_SOCKET))
+	if (bTCPConnect || (GetType() == SERVER && WelcomeSocket != INVALID_SOCKET))
 	{
 		std::cerr << "Cannot change port number, connection already established!" << std::endl;
 	}
@@ -259,7 +262,7 @@ SocketType MilestoneTwo::MySocket::GetType()
 
 void MilestoneTwo::MySocket::SetType(SocketType newSocketType)
 {
-	if (bTCPConnect || (GetType() == SERVER && ServerSocket != INVALID_SOCKET))
+	if (bTCPConnect || (GetType() == SERVER && WelcomeSocket != INVALID_SOCKET))
 	{
 		std::cerr << "Cannot change socket type, connection already established!" << std::endl;
 	}
@@ -271,7 +274,7 @@ void MilestoneTwo::MySocket::SetType(SocketType newSocketType)
 
 void MilestoneTwo::MySocket::SetConnType(ConnectionType newConnType)
 {
-	if (bTCPConnect || (GetType() == SERVER && ServerSocket != INVALID_SOCKET))
+	if (bTCPConnect || (GetType() == SERVER && WelcomeSocket != INVALID_SOCKET))
 	{
 		std::cerr << "Cannot change connection type, connection already established!" << std::endl;
 	}
@@ -284,4 +287,9 @@ void MilestoneTwo::MySocket::SetConnType(ConnectionType newConnType)
 ConnectionType MilestoneTwo::MySocket::GetConnType()
 {
 	return connectionType;
+}
+
+void MilestoneTwo::MySocket::getWSAError()
+{
+	std::cout << WSAGetLastError();
 }

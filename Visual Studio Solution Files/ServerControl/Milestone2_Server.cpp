@@ -3,7 +3,9 @@
 
 int main()
 {
-	MilestoneTwo::MySocket ServerSocket(SocketType::SERVER, "127.0.0.1", 5000, ConnectionType::TCP, 100);
+	//MilestoneTwo::MySocket ServerSocket(SocketType::SERVER, "127.0.0.1", 5000, ConnectionType::TCP, 100);
+
+	MilestoneTwo::MySocket ServerSocket(SocketType::SERVER, "127.0.0.1", 5000, ConnectionType::UDP, 100);
 
 	char buff[100];
 

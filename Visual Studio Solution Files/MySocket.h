@@ -8,7 +8,7 @@
 #ifndef PROJECT_MYSOCKET_H
 #define PROJECT_MYSOCKET_H
 
-#include "./ApplicationLayer/Globals.h"
+#include "ApplicationLayer/Globals.h"
 #include <iostream>
 #include <thread>
 #include <windows.networking.sockets.h>
@@ -18,7 +18,7 @@ namespace MilestoneTwo {
 	class MySocket {
 	private:
 		char* Buffer;					// RAW buffer space for communication activities
-		SOCKET ServerSocket;			// Used by a MySocket object configured as a TCP/IP SERVER
+		SOCKET WelcomeSocket;			// Used by a MySocket object configured as a TCP/IP SERVER
 		SOCKET ConnectionSocket;		// Used for client/server communications (Both TCP and UDP)
 		struct sockaddr_in SvrAddr;		// Stores connection information
 		SocketType mySocket;			// Holds the type of socket that the MySocket object is initialized to
@@ -28,6 +28,8 @@ namespace MilestoneTwo {
 		bool bTCPConnect;				// Determines if a connection has been established or not
 		int MaxSize;					/* Stores the maximum number of bytes the buffer is allocated to -
 											helps prevent overflows and synchronization issues */
+		void getWSAError();				/* Used for debugging purposes:
+			https://msdn.microsoft.com/en-us/library/windows/desktop/ms740668(v=vs.85).aspx */
 	public:
 		MySocket(SocketType, std::string, int, ConnectionType, int);
 		~MySocket();
