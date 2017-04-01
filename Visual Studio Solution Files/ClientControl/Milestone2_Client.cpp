@@ -17,6 +17,12 @@ int main()
 
 	std::cout << "Msg = " << buff << ", Bytes = " << RxSize << std::endl;
 
+	/* None of the 4 setters below should work */
+	TCPClientSocket.SetConnType(UDP);
+	TCPClientSocket.SetIPAddr("Hello");
+	TCPClientSocket.SetPortNo(100);
+	TCPClientSocket.SetType(SERVER);
+
 	TCPClientSocket.DisconnectTCP();
 
 	memset(buff, 0, sizeof(buff));
@@ -26,8 +32,15 @@ int main()
 
 	std::string UDPPkt = "I love BTN415 - Sent by UDP Client";
 
-	UDPClientSocket.ConnectTCP();	// Should not work!
+	/* ConnectTCP() should NOT work for a UDP connection */
+	UDPClientSocket.ConnectTCP();
 	UDPClientSocket.SendData(UDPPkt.c_str(), strlen(UDPPkt.c_str()) + 1);
+
+	/* None of the 4 setters below should work */
+	UDPClientSocket.SetConnType(TCP);
+	UDPClientSocket.SetIPAddr("My");
+	UDPClientSocket.SetPortNo(350);
+	UDPClientSocket.SetType(CLIENT);
 
 	RxSize = UDPClientSocket.GetData(buff);
 
