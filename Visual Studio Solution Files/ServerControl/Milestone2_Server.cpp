@@ -1,4 +1,3 @@
-#include <iostream>
 #include "../MySocket.h"
 
 int main()

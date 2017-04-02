@@ -2,7 +2,7 @@
 	Title:			BTN415 Project - Robotic Control Software - Winter 2016
 	Author(s):		Sean Prashad, Hao Chen, Stephen Noble
 	Student ID:		029-736-105, 022-905-152, 018-619-155
-	Description:	~ Header file containing all enumerations used for the entire project
+	Description:	~ Header file containing items used for the entire project
 */
 
 #ifndef PROJECT_PKTDEF_GLOBALS_H
@@ -12,7 +12,9 @@
 typedef	unsigned int ui;
 typedef unsigned char uc;
 
+#include <iostream>
 #include <string>
+#include <thread>
 
 /* Default namespace */
 enum SocketType
@@ -27,7 +29,8 @@ enum ConnectionType
 	UDP
 };
 
-const ui DEFAULT_SIZE = 128;
+const ui DEFAULT_SIZE = 128;			// Max size of our Buffer for the MySocket class
+static bool ExeComplete = false;		// Global flag used for Robot control execution
 
 namespace MilestoneOne {
 	enum CmdType				// Enumeration to define the command types for the Robot

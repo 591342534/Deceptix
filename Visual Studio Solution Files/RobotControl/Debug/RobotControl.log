@@ -1,0 +1,5 @@
+﻿  RobotControl.cpp
+RobotControl.obj : error LNK2019: unresolved external symbol "public: __thiscall MilestoneTwo::MySocket::MySocket(enum SocketType,class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >,int,enum ConnectionType,int)" (??0MySocket@MilestoneTwo@@QAE@W4SocketType@@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@HW4ConnectionType@@H@Z) referenced in function _main
+RobotControl.obj : error LNK2019: unresolved external symbol "public: __thiscall MilestoneTwo::MySocket::~MySocket(void)" (??1MySocket@MilestoneTwo@@QAE@XZ) referenced in function _main
+RobotControl.obj : error LNK2019: unresolved external symbol "public: void __thiscall MilestoneTwo::MySocket::ConnectTCP(void)" (?ConnectTCP@MySocket@MilestoneTwo@@QAEXXZ) referenced in function _main
+C:\Users\Sean\Desktop\version-control\Academic Projects\Decepticon_Communication_Software\Visual Studio Solution Files\Debug\RobotControl.exe : fatal error LNK1120: 3 unresolved externals
