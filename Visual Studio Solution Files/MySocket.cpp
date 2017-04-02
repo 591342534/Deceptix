@@ -11,10 +11,14 @@
 	as well as dynamically allocating memory for the receiving buffer. Servers are setup accordingly. */
 MilestoneTwo::MySocket::MySocket(SocketType newSocketType, std::string newIPAddr, int newPort, ConnectionType newConnectionType, int bufferLength)
 {
+	// Start the Winsock library for our Socket
+	start_DLLS();
+
+	// Initialize both sockets
 	WelcomeSocket = INVALID_SOCKET;
 	ConnectionSocket = INVALID_SOCKET;
 
-	// Utilize member functions to set class variables
+	SvrAddr.sin_family = AF_INET;		// Specifies to use IP
 	SetType(newSocketType);				// Sets either Client or Server
 	SetConnType(newConnectionType);		// Sets either TCP or UDP
 	SetPortNo(newPort);
@@ -25,11 +29,9 @@ MilestoneTwo::MySocket::MySocket(SocketType newSocketType, std::string newIPAddr
 	(bufferLength < 0 ? MaxSize = DEFAULT_SIZE : MaxSize = bufferLength);
 
 	Buffer = new char[MaxSize];
-
 	memset(Buffer, 0, MaxSize);
 
-	// Start the Winsock library for our Socket
-	start_DLLS();
+	bTCPConnect = false;
 
 	if (connectionType == TCP && mySocket == SERVER)
 	{
@@ -46,10 +48,6 @@ MilestoneTwo::MySocket::MySocket(SocketType newSocketType, std::string newIPAddr
 			std::cin.get();
 			exit(0);
 		}
-
-		SvrAddr.sin_family = AF_INET;
-		SvrAddr.sin_port = htons(this->Port);
-		SvrAddr.sin_addr.s_addr = inet_addr(this->IPAddr.c_str());
 
 		if (mySocket == SERVER)
 		{
@@ -97,14 +95,14 @@ void MilestoneTwo::MySocket::ConnectTCP()
 			exit(0);
 		}
 
+		SvrAddr.sin_family = AF_INET;
+		SetPortNo(Port);
+		SetIPAddr(IPAddr);
+		bTCPConnect = false;
+
 		if (mySocket == CLIENT)
 		{
 			std::cout << "Trying to connect to the server" << std::endl;
-
-			bTCPConnect = false;
-			SvrAddr.sin_family = AF_INET;
-			SvrAddr.sin_port = htons(this->Port);
-			SvrAddr.sin_addr.s_addr = inet_addr(this->IPAddr.c_str());
 
 			while (!bTCPConnect) {
 				if ((connect(this->ConnectionSocket, (struct sockaddr *)&SvrAddr, sizeof(SvrAddr))) == SOCKET_ERROR)
@@ -112,8 +110,8 @@ void MilestoneTwo::MySocket::ConnectTCP()
 					std::this_thread::sleep_for(std::chrono::milliseconds(200));
 				}
 				else {
-					std::cout << "Connection Established" << std::endl;
 					bTCPConnect = true;
+					std::cout << "Connection Established" << std::endl;
 				}
 			}
 		}
@@ -128,10 +126,6 @@ void MilestoneTwo::MySocket::ConnectTCP()
 				std::cin.get();
 				exit(0);
 			}
-
-			SvrAddr.sin_family = AF_INET;
-			SvrAddr.sin_port = htons(this->Port);
-			SvrAddr.sin_addr.s_addr = inet_addr(this->IPAddr.c_str());
 
 			if ((bind(this->WelcomeSocket, (struct sockaddr *)&SvrAddr, sizeof(SvrAddr))) == SOCKET_ERROR)
 			{
@@ -166,8 +160,8 @@ void MilestoneTwo::MySocket::ConnectTCP()
 			}
 			else
 			{
-				std::cout << "Connection Accepted" << std::endl;
 				bTCPConnect = true;
+				std::cout << "Connection Accepted" << std::endl;
 			}
 		}
 	}
@@ -218,6 +212,7 @@ void MilestoneTwo::MySocket::SetIPAddr(std::string newIPAddress)
 	else
 	{
 		IPAddr = newIPAddress;
+		SvrAddr.sin_addr.s_addr = inet_addr(this->IPAddr.c_str());
 	}
 }
 
@@ -231,6 +226,7 @@ void MilestoneTwo::MySocket::SetPortNo(int newPortNumber)
 	else
 	{
 		Port = newPortNumber;
+		SvrAddr.sin_port = htons(this->Port);
 	}
 }
 

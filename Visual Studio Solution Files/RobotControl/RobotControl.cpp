@@ -27,9 +27,9 @@ int main(int argc, char *argv[])
 
 	//MilestoneTwo::MySocket TCPClientSocket(SocketType::CLIENT, "127.0.0.1", 5000, ConnectionType::TCP, 100);
 
-	MilestoneTwo::MySocket commandSocket(SocketType::CLIENT, std::string(argv[2]), (int)argv[3], ConnectionType::TCP, 100);
+	//MilestoneTwo::MySocket commandSocket(SocketType::CLIENT, std::string(argv[2]), (int)argv[3], ConnectionType::TCP, 100);
 
-	std::thread threadOne(&MilestoneTwo::MySocket::ConnectTCP, &commandSocket);
+	//std::thread threadOne(&MilestoneTwo::MySocket::ConnectTCP, &commandSocket);
 
 	//std::thread threadTwo();
 	//threadOne(threadTwo(), ).detach();
