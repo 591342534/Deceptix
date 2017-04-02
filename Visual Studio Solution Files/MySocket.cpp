@@ -20,7 +20,7 @@ MilestoneTwo::MySocket::MySocket(SocketType newSocketType, std::string newIPAddr
 
 	SvrAddr.sin_family = AF_INET;		// Specifies to use IP
 	SetType(newSocketType);				// Sets either Client or Server
-	SetConnType(newConnectionType);		// Sets either TCP or UDP
+	connectionType = newConnectionType;
 	SetPortNo(newPort);
 	SetIPAddr(newIPAddr);
 
@@ -85,7 +85,6 @@ void MilestoneTwo::MySocket::ConnectTCP()
 {
 	if (connectionType == TCP)
 	{
-		// Initialize a Connection socket regardless of Client/Server/TCP or UDP (we ALWAYS need to do it!)
 		ConnectionSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 		if (ConnectionSocket == INVALID_SOCKET)
 		{
@@ -243,19 +242,6 @@ void MilestoneTwo::MySocket::SetType(SocketType newSocketType)
 	}
 }
 
-// Sets a Connection Type - contains logic to prevent changes being made if a TCP/IP connection has 
-void MilestoneTwo::MySocket::SetConnType(ConnectionType newConnType)
-{
-	if (bTCPConnect || (GetType() == SERVER && WelcomeSocket != INVALID_SOCKET))
-	{
-		std::cerr << "Cannot change connection type, connection already established!" << std::endl;
-	}
-	else
-	{
-		connectionType = newConnType;
-	}
-}
-
 /* Function used to receive data on the internal buffer then copy it to the argument buffer.
 	Works with both TCP and UDP. */
 int MilestoneTwo::MySocket::GetData(char* rawData)
@@ -296,11 +282,6 @@ int MilestoneTwo::MySocket::GetPort()
 SocketType MilestoneTwo::MySocket::GetType()
 {
 	return mySocket;
-}
-
-ConnectionType MilestoneTwo::MySocket::GetConnType()
-{
-	return connectionType;
 }
 
 // Function used during debugging to display error codes from functions like send(), recv(), sendto() and recvfrom()

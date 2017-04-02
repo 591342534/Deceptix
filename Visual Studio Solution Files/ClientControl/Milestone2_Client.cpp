@@ -17,7 +17,6 @@ int main()
 	std::cout << "Msg = " << buff << ", Bytes = " << RxSize << std::endl;
 
 	/* None of the 4 setters below should work */
-	TCPClientSocket.SetConnType(UDP);
 	TCPClientSocket.SetIPAddr("Hello");
 	TCPClientSocket.SetPortNo(100);
 	TCPClientSocket.SetType(SERVER);
@@ -35,10 +34,8 @@ int main()
 	UDPClientSocket.ConnectTCP();
 	UDPClientSocket.SendData(UDPPkt.c_str(), strlen(UDPPkt.c_str()) + 1);
 
-	/* None of the 4 setters below should work */
-	UDPClientSocket.SetConnType(TCP);
-	UDPClientSocket.SetIPAddr("My");
-	UDPClientSocket.SetPortNo(350);
+	UDPClientSocket.SetIPAddr("255.255.255.255");
+	UDPClientSocket.SetPortNo(5000);
 	UDPClientSocket.SetType(CLIENT);
 
 	RxSize = UDPClientSocket.GetData(buff);

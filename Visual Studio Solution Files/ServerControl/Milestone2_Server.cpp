@@ -13,7 +13,6 @@ int main()
 	std::cout << "Msg = " << buff << ", Bytes = " << RxSize << std::endl;
 
 	/* None of the 4 setters below should work */
-	TCPServerSocket.SetConnType(TCP);
 	TCPServerSocket.SetIPAddr("Name");
 	TCPServerSocket.SetPortNo(9001);
 	TCPServerSocket.SetType(CLIENT);
@@ -31,10 +30,8 @@ int main()
 
 	std::string UDPPkt = "I love BTN415 too - Sent by UDP Server";
 
-	/* None of the 4 setters below should work */
-	UDPServerSocket.SetConnType(UDP);
-	UDPServerSocket.SetIPAddr("Is");
-	UDPServerSocket.SetPortNo(69);
+	UDPServerSocket.SetIPAddr("255.255.255.255");
+	UDPServerSocket.SetPortNo(5000);
 	UDPServerSocket.SetType(SERVER);
 
 	RxSize = UDPServerSocket.GetData(buff);

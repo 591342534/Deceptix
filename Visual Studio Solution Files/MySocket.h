@@ -38,12 +38,10 @@ namespace MilestoneTwo {
 		void SetIPAddr(std::string);
 		void SetPortNo(int);
 		void SetType(SocketType);
-		void SetConnType(ConnectionType);
 		int GetData(char*);
 		std::string GetIPAddr();
 		int GetPort();
 		SocketType GetType();
-		ConnectionType GetConnType();
 	};
 }
 #endif
