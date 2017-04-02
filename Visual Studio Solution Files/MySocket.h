@@ -35,10 +35,10 @@ namespace MilestoneTwo {
 		void ConnectTCP();
 		void DisconnectTCP();
 		void SendData(const char*, int);
+		int GetData(char*);
 		void SetIPAddr(std::string);
 		void SetPortNo(int);
 		void SetType(SocketType);
-		int GetData(char*);
 		std::string GetIPAddr();
 		int GetPort();
 		SocketType GetType();

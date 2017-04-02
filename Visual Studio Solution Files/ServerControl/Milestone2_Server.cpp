@@ -30,12 +30,14 @@ int main()
 
 	std::string UDPPkt = "I love BTN415 too - Sent by UDP Server";
 
+	RxSize = UDPServerSocket.GetData(buff);
+
 	UDPServerSocket.SetIPAddr("255.255.255.255");
 	UDPServerSocket.SetPortNo(5000);
 	UDPServerSocket.SetType(SERVER);
 
-	RxSize = UDPServerSocket.GetData(buff);
-
+	/* Note: The server program will finish but the client will forever be waiting for data because we called GetData() but here
+		we sent the data to a random IP Address of 255.255.2555.255 and Port number 5000 */
 	UDPServerSocket.SendData(UDPPkt.c_str(), strlen(UDPPkt.c_str()) + 1);
 
 	std::cout << "Msg = " << buff << ", Bytes = " << RxSize << std::endl;

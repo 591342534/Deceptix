@@ -200,50 +200,8 @@ void MilestoneTwo::MySocket::SendData(const char* rawData, int bufferLength)
 	}
 }
 
-// Sets an IP Address - contains logic to prevent changes being made if a TCP/IP connection has been established or Welcome socket is open
-void MilestoneTwo::MySocket::SetIPAddr(std::string newIPAddress)
-{
-	// Only allow modification of our IP Address if there is NOT a connection already established
-	if (bTCPConnect || (GetType() == SERVER && WelcomeSocket != INVALID_SOCKET))
-	{
-		std::cerr << "Cannot change IP address, connection already established!" << std::endl;
-	}
-	else
-	{
-		IPAddr = newIPAddress;
-		SvrAddr.sin_addr.s_addr = inet_addr(this->IPAddr.c_str());
-	}
-}
-
-// Sets a Port number - contains logic to prevent changes being made if a TCP/IP connection has been established or Welcome socket is open
-void MilestoneTwo::MySocket::SetPortNo(int newPortNumber)
-{
-	if (bTCPConnect || (GetType() == SERVER && WelcomeSocket != INVALID_SOCKET))
-	{
-		std::cerr << "Cannot change port number, connection already established!" << std::endl;
-	}
-	else
-	{
-		Port = newPortNumber;
-		SvrAddr.sin_port = htons(this->Port);
-	}
-}
-
-// Sets a Socket Type - contains logic to prevent changes being made if a TCP/IP connection has been established or Welcome socket is open
-void MilestoneTwo::MySocket::SetType(SocketType newSocketType)
-{
-	if (bTCPConnect || (GetType() == SERVER && WelcomeSocket != INVALID_SOCKET))
-	{
-		std::cerr << "Cannot change socket type, connection already established!" << std::endl;
-	}
-	else
-	{
-		mySocket = newSocketType;
-	}
-}
-
 /* Function used to receive data on the internal buffer then copy it to the argument buffer.
-	Works with both TCP and UDP. */
+Works with both TCP and UDP. */
 int MilestoneTwo::MySocket::GetData(char* rawData)
 {
 	int numOfBytesReceived = 0;
@@ -267,6 +225,48 @@ int MilestoneTwo::MySocket::GetData(char* rawData)
 	}
 
 	return numOfBytesReceived;
+}
+
+// Sets an IP Address - contains logic to prevent changes being made if a TCP/IP connection has been established or Welcome socket is open
+void MilestoneTwo::MySocket::SetIPAddr(std::string newIPAddress)
+{
+	// Only allow modification of our IP Address if there is NOT a connection already established
+	if (bTCPConnect || (GetType() == SERVER && WelcomeSocket != INVALID_SOCKET))
+	{
+		std::cerr << "Cannot change IP address, connection already established!" << std::endl;
+	}
+	else
+	{
+		IPAddr = newIPAddress;
+		SvrAddr.sin_addr.s_addr = inet_addr(IPAddr.c_str());
+	}
+}
+
+// Sets a Port number - contains logic to prevent changes being made if a TCP/IP connection has been established or Welcome socket is open
+void MilestoneTwo::MySocket::SetPortNo(int newPortNumber)
+{
+	if (bTCPConnect || (GetType() == SERVER && WelcomeSocket != INVALID_SOCKET))
+	{
+		std::cerr << "Cannot change port number, connection already established!" << std::endl;
+	}
+	else
+	{
+		Port = newPortNumber;
+		SvrAddr.sin_port = htons(Port);
+	}
+}
+
+// Sets a Socket Type - contains logic to prevent changes being made if a TCP/IP connection has been established or Welcome socket is open
+void MilestoneTwo::MySocket::SetType(SocketType newSocketType)
+{
+	if (bTCPConnect || (GetType() == SERVER && WelcomeSocket != INVALID_SOCKET))
+	{
+		std::cerr << "Cannot change socket type, connection already established!" << std::endl;
+	}
+	else
+	{
+		mySocket = newSocketType;
+	}
 }
 
 std::string MilestoneTwo::MySocket::GetIPAddr()

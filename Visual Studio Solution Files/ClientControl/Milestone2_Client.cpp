@@ -38,6 +38,8 @@ int main()
 	UDPClientSocket.SetPortNo(5000);
 	UDPClientSocket.SetType(CLIENT);
 
+	/* Note: The client program will be forever waiting for data because we called GetData() but here
+		the server sent the data to a random IP Address of 255.255.2555.255 and Port number 5000 - NOT OURS! */
 	RxSize = UDPClientSocket.GetData(buff);
 
 	std::cout << "Msg = " << buff << ", Bytes = " << RxSize << std::endl;
