@@ -37,6 +37,9 @@ void TelemetryThreadLogic(std::string IPAddr, int Port)
 				// If the calculated CRC is good, move onto verification of the Header (AKA STATUS BIT SET!
 				if (TelemetryPacket.GetStatus())
 				{
+					// Display RAW data packet
+					std::cout << "RAW Data: " << RxBuffer << std::endl;
+
 					// All checks have passed! Let's display the raw Telemetry data
 
 					TelemetryBody body;
@@ -61,6 +64,19 @@ void TelemetryThreadLogic(std::string IPAddr, int Port)
 					body.ArmDown = ((*ptr) >> 2) & 0X01;
 					body.ClawOpen = ((*ptr) >> 3) & 0X01;
 					body.ClawClosed = ((*ptr) >> 4) & 0X01;
+
+					// TODO: Setw() and format the output nicely
+
+					// Display the Sonar reading followed by the Arm reading
+					std::cout << "Sonar Reading of: " << body.SensorData << std::endl;
+
+					std::cout << "Arm Reading of: " << body.ArmPositionData << std::endl;
+
+					std::cout << "Drive flag is: " << body.Drive << std::endl;
+
+					(body.ArmUp) ? std::cout << "Arm is Up," : std::cout << "Arm is Down,";
+
+					(body.ClawOpen) ? std::cout << "Claw is Open" << std::endl : std::cout << "Claw is Closed" << std::endl;
 				}
 				else { throw "Status bit was not set for Telemetry data. Dropping packet."; }
 			}
@@ -79,12 +95,13 @@ void TelemetryThreadLogic(std::string IPAddr, int Port)
 
 void CommandThreadLogic(std::string IPAddr, int Port)
 {
-	MySocket CommandSocket(SocketType::CLIENT, IPAddr, Port, ConnectionType::TCP, 100);
-	CommandSocket.ConnectTCP();			// Perform the 3-way handshake to connect to a TCP server
 	PktDef CommandPacket;
 	char* RxBuffer = nullptr;
 	char* TxBuffer = nullptr;
 	bool sleepCondition = false;
+
+	MySocket CommandSocket(SocketType::CLIENT, IPAddr, Port, ConnectionType::TCP, 100);
+	CommandSocket.ConnectTCP();			// Perform the 3-way handshake to connect to a TCP server
 
 	// Set the PktCount number to 0 initially then each subsequent time we'll need to increment it
 	CommandPacket.SetPktCount(0);
@@ -101,46 +118,48 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 
 		TxBuffer = CommandPacket.GenPacket();
 
-		// Increment the PktCount number
+		// Increment the PktCount number AFTER we generate the packet to send!
 		CommandPacket.SetPktCount(CommandPacket.GetPktCount() + 1);
 
 		CommandSocket.SendData(TxBuffer, CommandPacket.GetLength());
 
-		// Get the response from the Robot
+		// Wait for Senpai to acknowledge us
 		int size = CommandSocket.GetData(RxBuffer);
 
-		if (CommandPacket.CheckCRC(RxBuffer, size))	// Validating the Robots CRC
+		PktDef RobotPacket(RxBuffer);
+
+		/* We need to check if the Megatron acknowledged the original command we sent! */
+		if ((RobotPacket.GetCmd() == CommandPacket.GetCmd()) && RobotPacket.GetAck())
 		{
-			// Proceed to check if the SLEEP command was acknowledged
-			char* ptr = RxBuffer;
-
-			// Move past PktCount to the beginning of the bit fields
-			ptr += sizeof(int);
-
-			/*
-				XX@X X@XX = 24 in HEX, AKA 0X24!
-				Drive Status Sleep Arm || Claw Ack Pad Pad - 1 byte in total
-			*/
-
-			/*
-				Check the positions that the SLEEP and ACK flags are positioned at,
-				if they are BOTH set (bitwise AND will check) then we KNOW that a SLEEP
-				flag AND an ACK flag has been sent by the Robot. We'll need to break from the loop!
-			*/
-			if (((*ptr) & 0X24) == 0X24 ? true : false)
+			if (RobotPacket.CheckCRC(RxBuffer, size))	// Validating the Robots CRC
 			{
-				CommandSocket.DisconnectTCP();	// Disconnect the MySocket
+				// Check if the SLEEP command we sent was RETURNED AND ACKNOWLEDGED by Megatron
+				if ((CommandPacket.GetCmd() == SLEEP && RobotPacket.GetCmd() == SLEEP) && RobotPacket.GetAck())
+				{
 
-				ExeComplete = true;
+					ExeComplete = true;
 
-				// Break from the infinity loop
-				break;
+					CommandSocket.DisconnectTCP();	// Disconnect the CommandSocket
+
+													// Break from the Megatron's grasp
+					break;
+				}
+				else		// Megatron acknowledged our request, let's display what he did
+				{
+					std::cout << "Megatron responded with an ACK of: " << RobotPacket.GetAck() << " for our " << RobotPacket.GetCmd() << " command" << std::endl;
+
+					// Note: Need to add string mapping to enumeration for display purposes
+				}
+			}
+			else
+			{
+				// We received an incorrect CRC from the Megatron! SABOTAGE!!!
+				std::cout << "Incorrect CRC sent by Megatron. Dropping packet!" << RxBuffer;
 			}
 		}
-		else 
+		else if (RobotPacket.CheckNACK())	// We received a NACK from the Megatron, aka my dating life
 		{
-			// We received an incorrect CRC from the Robot! SABOTAGE!
-			std::cout << "Incorrect CRC sent by Robot. Dropping packet!" << RxBuffer;
+			std::cout << "Megatron responded with a NACK!" << std::endl;
 		}
 	}
 }
@@ -164,16 +183,12 @@ int main(int argc, char *argv[])
 
 	ExeComplete = false;
 
-	// Spawn both the Command Telemetry thread then detach from the main process
-	// NOTE PASS SHTIT TO CMD THREAD
-
 	// First argument is the function we want to call (aka the logic), arguments thereafter are the ARGUMENTS to that specific function
-	std::thread(CommandThreadLogic, argv[2], (int)argv[3]);
+	std::thread(CommandThreadLogic, argv[2], (int)argv[3]).detach();
 
-	//Telemetry thread will use the same IP address as the command thread. 
-	std::thread(TelemetryThreadLogic, argv[2], (int)argv[4]);
-
-	
+	// Telemetry thread will use the same IP address as the command thread. 
+	std::thread(TelemetryThreadLogic, argv[2], (int)argv[4]).detach();
+		
 	// Loop forever until ExeComplete is true!
 	while (!ExeComplete) { }
 }

@@ -29,6 +29,7 @@ public:
 	int GetLength();				// Returns the length of the packet in bytes
 	int CalculateBodyLength();		// ADDITIONAL GETTER: Calculates the length of the dynamic body field
 	bool GetStatus();				// Returns a boolean value based on the STATUS flag bit
+	bool CheckNACK();				// Returns a boolean value if all of the bit fields are set to 0
 	char* GetBodyData();			// Returns a ptr to the objects Body field
 	int GetPktCount();				// Returns the PktCount value
 	bool CheckCRC(char*, int);		/* Takes a ptr to a RAW data buffer, the size of the buffer in bytes and calculates the CRC.
