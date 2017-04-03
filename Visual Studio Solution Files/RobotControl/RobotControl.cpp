@@ -5,8 +5,81 @@
 	Description:	Implementation file for RobotControl.h
 */
 
-#include "../MySocket.h"
-#include "../ApplicationLayer/PktDef.h"
+#include "MySocket.h"
+#include "PktDef.h"
+
+void TelemetryThreadLogic()
+{
+
+}
+
+void CommandThreadLogic(std::string IPAddr, int Port)
+{
+	MilestoneTwo::MySocket CommandSocket(SocketType::CLIENT, IPAddr, Port, ConnectionType::TCP, 100);
+	CommandSocket.ConnectTCP();			// Perform the 3-way handshake to connect to a TCP server
+	MilestoneOne::PktDef CommandPacket;
+	char* RxBuffer = nullptr;
+	char* TxBuffer = nullptr;
+	bool sleepCondition = false;
+
+	// Set the PktCount number to 0 initially then each subsequent time we'll need to increment it
+	CommandPacket.SetPktCount(0);
+	
+	while (1)
+	{
+		// TODO: Get all of the necessary data from the user
+		//std::cout << "Please enter the details of the packet." << std::endl;
+		//std::cout << "Format is as follows:" << std::endl << std::endl;
+		//std::cout << "CommandType: " << std::endl << std::endl;
+		
+		// Generate the CRC before sending out packet
+		CommandPacket.CalcCRC();
+
+		TxBuffer = CommandPacket.GenPacket();
+
+		// Increment the PktCount number
+		CommandPacket.SetPktCount(CommandPacket.GetPktCount() + 1);
+
+		CommandSocket.SendData(TxBuffer, CommandPacket.GetLength());
+
+		// Get the response from the Robot
+		int size = CommandSocket.GetData(RxBuffer);
+
+		if (CommandPacket.CheckCRC(RxBuffer, size))	// Validating the Robots CRC
+		{
+			// Proceed to check if the SLEEP command was acknowledged
+			char* ptr = RxBuffer;
+
+			// Move past PktCount to the beginning of the bit fields
+			ptr += sizeof(int);
+
+			/*
+				XX@X X@XX = 24 in HEX, AKA 0X24!
+				Drive Status Sleep Arm || Claw Ack Pad Pad - 1 byte in total
+			*/
+
+			/*
+				Check the positions that the SLEEP and ACK flags are positioned at,
+				if they are BOTH set (bitwise AND will check) then we KNOW that a SLEEP
+				flag AND an ACK flag has been sent by the Robot. We'll need to break from the loop!
+			*/
+			if (((*ptr) & 0X24) == 0X24 ? true : false)
+			{
+				CommandSocket.DisconnectTCP();	// Disconnect the MySocket
+
+				ExeComplete = true;
+
+				// Break from the infinity loop
+				break;
+			}
+		}
+		else 
+		{
+			// We received an incorrect CRC from the Robot! SABOTAGE!
+			std::cout << "Incorrect CRC sent by Robot. Dropping packet!" << RxBuffer;
+		}
+	}
+}
 
 int main(int argc, char *argv[])
 {
@@ -28,30 +101,11 @@ int main(int argc, char *argv[])
 	ExeComplete = false;
 
 	// Spawn both the Command Telemetry thread then detach from the main process
+	// NOTE PASS SHTIT TO CMD THREAD
 
-	/*while (!ExeComplete)
-	{
-
-	}*/
+	// First argument is the function we want to call (aka the logic), arguments thereafter are the ARGUMENTS to that specific function
+	std::thread(CommandThreadLogic, argv[2], (int)argv[3]);
 	
-	MilestoneTwo::MySocket CommandSocket(SocketType::CLIENT, (std::string)argv[2], (int)argv[3], ConnectionType::TCP, 100);
-	CommandSocket.ConnectTCP();			// Perform the 3-way handshake to connect to a TCP server
-	MilestoneOne::PktDef CommandPacket;
-
-	// Get all of the necessary data from the user
-
-	// Generate the CRC before sending out packet
-	CommandPacket.CalcCRC();
-	char* RxBuffer = nullptr;
-	char* TxBuffer = CommandPacket.GenPacket();
-
-	// Increment the PktCount number
-	CommandPacket.SetPktCount(CommandPacket.GetPktCount() + 1);
-
-	CommandSocket.SendData(TxBuffer, CommandPacket.GetLength());
-
-	CommandSocket.GetData(RxBuffer);
-
-	// Print the results of what the robot said to us!
-	std::cout << RxBuffer;
+	// Loop forever until ExeComplete is true!
+	while (!ExeComplete) { }
 }

@@ -8,7 +8,7 @@
 #ifndef PROJECT_MYSOCKET_H
 #define PROJECT_MYSOCKET_H
 
-#include "ApplicationLayer/Globals.h"
+#include "Globals.h"
 #include <windows.networking.sockets.h>
 #pragma comment(lib, "Ws2_32.lib")
 

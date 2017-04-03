@@ -146,7 +146,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="MySocket.cpp" />
+    <ClCompile Include="PktDef.cpp" />
     <ClCompile Include="RobotControl.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CmdPacket.h" />
+    <ClInclude Include="CmdPacketHeader.h" />
+    <ClInclude Include="Globals.h" />
+    <ClInclude Include="MotorBody.h" />
+    <ClInclude Include="MySocket.h" />
+    <ClInclude Include="PktDef.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
