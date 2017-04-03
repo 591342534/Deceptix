@@ -11,27 +11,25 @@
 #include "CmdPacketHeader.h"
 #include "MotorBody.h"
 
-namespace MilestoneOne {
-	struct CmdPacket
+struct CmdPacket
+{
+private:
+public:
+	CmdPacketHeader Header;		// Note: Structure within a structure
+								// It must be dynamic and generic, not specific to MotorBody - Elliot 2017
+	char* Data;					// The data could be raw telemetry, empty or a MotorBody structure. 
+	uc CRC;						// Contains the CRC value
+
+	CmdPacket()
 	{
-	private:
-	public:
-		CmdPacketHeader Header;		// Note: Structure within a structure
-									// It must be dynamic and generic, not specific to MotorBody - Elliot 2017
-		char* Data;					// The data could be raw telemetry, empty or a MotorBody structure. 
-		uc CRC;						// Contains the CRC value
+		Data = nullptr;
+		CRC = 0;
+	}
 
-		CmdPacket()
-		{
-			Data = nullptr;
-			CRC = 0;
-		}
-
-		~CmdPacket()
-		{
-			delete Data;
-			Data = nullptr;
-		}
-	};
-}
+	~CmdPacket()
+	{
+		delete Data;
+		Data = nullptr;
+	}
+};
 #endif

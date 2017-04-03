@@ -8,19 +8,17 @@
 #ifndef PROJECT_MOTORBODY_H
 #define PROJECT_MOTORBODY_H
 
-namespace MilestoneOne {
-	struct MotorBody
-	{
-	private:
-	public:
-		uc Direction;		// Holds a value that corresponds to one of the following commands: DRIVE, ARM, CLAW
-		uc Duration;		// Holds a value that specifies the duration of a command (in seconds)
+struct MotorBody
+{
+private:
+public:
+	uc Direction;		// Holds a value that corresponds to one of the following commands: DRIVE, ARM, CLAW
+	uc Duration;		// Holds a value that specifies the duration of a command (in seconds)
 
-		MotorBody()
-		{
-			Direction = 0;
-			Duration = 0;
-		}
-	};
-}
+	MotorBody()
+	{
+		Direction = 0;
+		Duration = 0;
+	}
+};
 #endif

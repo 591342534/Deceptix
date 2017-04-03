@@ -8,16 +8,42 @@
 #include "MySocket.h"
 #include "PktDef.h"
 
-void TelemetryThreadLogic()
+void TelemetryThreadLogic(std::string IPAddr, int Port)
 {
+	MySocket TelemetrySocket(SocketType::CLIENT, IPAddr, Port, ConnectionType::TCP, 100);
+	TelemetrySocket.ConnectTCP();	// Perform the 3-way handshake to connect to a TCP server
+	PktDef TelemetryPacket;
 
+	//ASSUMPTION: Packet body is structured in a specific sequence for parsing.
+	char* RxBuffer = nullptr;
+	//Receive and process incoming telemetry packets from the Robot continuously
+	while (1) {
+		//Reset the pointer 
+		delete [] RxBuffer;
+		RxBuffer = nullptr;
+		//Receive incoming Telemetry Packet
+		int bytesReceived = TelemetrySocket.GetData(RxBuffer);
+		if (TelemetryPacket.CheckCRC(RxBuffer, bytesReceived)) {
+			PktDef incomingTelPacket(RxBuffer);		//TODO: do we generate packet inside constructor? (GENPACKET function in constructor)
+			int dataSize = incomingTelPacket.CalculateBodyLength();
+			char* buffer = new char[dataSize];
+			buffer = incomingTelPacket.GetBodyData();
+
+
+
+		}
+
+
+
+
+	}
 }
 
 void CommandThreadLogic(std::string IPAddr, int Port)
 {
-	MilestoneTwo::MySocket CommandSocket(SocketType::CLIENT, IPAddr, Port, ConnectionType::TCP, 100);
+	MySocket CommandSocket(SocketType::CLIENT, IPAddr, Port, ConnectionType::TCP, 100);
 	CommandSocket.ConnectTCP();			// Perform the 3-way handshake to connect to a TCP server
-	MilestoneOne::PktDef CommandPacket;
+	PktDef CommandPacket;
 	char* RxBuffer = nullptr;
 	char* TxBuffer = nullptr;
 	bool sleepCondition = false;
@@ -105,6 +131,10 @@ int main(int argc, char *argv[])
 
 	// First argument is the function we want to call (aka the logic), arguments thereafter are the ARGUMENTS to that specific function
 	std::thread(CommandThreadLogic, argv[2], (int)argv[3]);
+
+	//Telemetry thread will use the same IP address as the command thread. 
+	std::thread(TelemetryThreadLogic, argv[2], (int)argv[4]);
+
 	
 	// Loop forever until ExeComplete is true!
 	while (!ExeComplete) { }

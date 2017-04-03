@@ -32,34 +32,33 @@ enum ConnectionType
 const ui DEFAULT_SIZE = 128;			// Max size of our Buffer for the MySocket class
 static bool ExeComplete = false;		// Global flag used for Robot control execution
 
-namespace MilestoneOne {
-	enum CmdType				// Enumeration to define the command types for the Robot
-	{
-		DRIVE = 0,
-		SLEEP,
-		ARM,
-		CLAW,
-		ACK,
-		STATUS = 200,
-		NACK = 404
-	};
+enum CmdType				// Enumeration to define the command types for the Robot
+{
+	DRIVE = 0,
+	SLEEP,
+	ARM,
+	CLAW,
+	ACK,
+	STATUS = 200,
+	NACK = 404
+};
 
-	// DRIVE command parameter definitions
-	const ui FORWARD = 1;
-	const ui BACKWARD = 2;
-	const ui LEFT = 3;
-	const ui RIGHT = 4;
+// DRIVE command parameter definitions
+const ui FORWARD = 1;
+const ui BACKWARD = 2;
+const ui LEFT = 3;
+const ui RIGHT = 4;
 
-	// ARM command parameter definitions
-	const ui UP = 5;
-	const ui DOWN = 6;
+// ARM command parameter definitions
+const ui UP = 5;
+const ui DOWN = 6;
 
-	// CLAW command parameter definitions
-	const ui OPEN = 7;
-	const ui CLOSE = 8;
-	
-	// Represents the size of the CmdPacketHeader structure in Bytes	
-	const ui HEADERSIZE = 6;
-	const ui HEADERSIZEOFFSET = 2;		// To account for the extra bytes added after the CmdPacket.Header structure
-}
+// CLAW command parameter definitions
+const ui OPEN = 7;
+const ui CLOSE = 8;
+
+// Represents the size of the CmdPacketHeader structure in Bytes	
+const ui HEADERSIZE = 6;
+const ui HEADERSIZEOFFSET = 2;		// To account for the extra bytes added after the CmdPacket.Header structure
+
 #endif

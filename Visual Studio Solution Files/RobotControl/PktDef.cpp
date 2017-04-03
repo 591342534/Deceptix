@@ -7,7 +7,7 @@
 
 #include "PktDef.h"
 
-MilestoneOne::PktDef::PktDef()
+PktDef::PktDef()
 {
 	/*
 		Constructor inside each structure handles initialization to 0.
@@ -17,7 +17,7 @@ MilestoneOne::PktDef::PktDef()
 	RawBuffer = nullptr;
 }
 
-MilestoneOne::PktDef::PktDef(char* rawData)		// Constructor called when we receive a stream of raw data
+PktDef::PktDef(char* rawData)		// Constructor called when we receive a stream of raw data
 {
 	char* ptr = rawData;
 
@@ -62,7 +62,7 @@ MilestoneOne::PktDef::PktDef(char* rawData)		// Constructor called when we recei
 
 		memcpy(&mb.Duration, ptr, sizeof(uc));
 
-		SetBodyData(reinterpret_cast<char*>(&mb), sizeof(MilestoneOne::MotorBody));
+		SetBodyData(reinterpret_cast<char*>(&mb), sizeof(MotorBody));
 	}
 	else if (CmdPacket.Header.Status)
 	{
@@ -101,7 +101,7 @@ MilestoneOne::PktDef::PktDef(char* rawData)		// Constructor called when we recei
 	ptr = nullptr;
 }
 
-void MilestoneOne::PktDef::SetCmd(CmdType newCmdType)
+void PktDef::SetCmd(CmdType newCmdType)
 {
 	switch (newCmdType)
 	{
@@ -145,7 +145,7 @@ void MilestoneOne::PktDef::SetCmd(CmdType newCmdType)
 	}
 }
 
-void MilestoneOne::PktDef::SetBodyData(char* rawData, int bufferLength)
+void PktDef::SetBodyData(char* rawData, int bufferLength)
 {
 	// Initialize the specified amount of bytes required
 	CmdPacket.Data = new char[bufferLength];
@@ -165,12 +165,12 @@ void MilestoneOne::PktDef::SetBodyData(char* rawData, int bufferLength)
 	CmdPacket.Header.Length = HEADERSIZE + bufferLength + sizeof(CmdPacket.CRC);
 }
 
-void MilestoneOne::PktDef::SetPktCount(int newPktCount)
+void PktDef::SetPktCount(int newPktCount)
 {
 	CmdPacket.Header.PktCount = newPktCount;
 }
 
-MilestoneOne::CmdType MilestoneOne::PktDef::GetCmd()
+CmdType PktDef::GetCmd()
 {
 	// Return the CmdType based on the set flag bit
 	if (CmdPacket.Header.Drive) { return DRIVE; }
@@ -182,7 +182,7 @@ MilestoneOne::CmdType MilestoneOne::PktDef::GetCmd()
 	else { return NACK; }
 }
 
-bool MilestoneOne::PktDef::GetAck()
+bool PktDef::GetAck()
 {
 	/*
 		Is the Header's ACK flag set equal to 1? (aka is it true?),
@@ -191,27 +191,27 @@ bool MilestoneOne::PktDef::GetAck()
 	return (CmdPacket.Header.Ack == 1 ? true : false);
 }
 
-int MilestoneOne::PktDef::GetLength()
+int PktDef::GetLength()
 {
 	return CmdPacket.Header.Length;
 }
 
-int MilestoneOne::PktDef::CalculateBodyLength()		// Additional function to calculate the dynamic body's size
+int PktDef::CalculateBodyLength()		// Additional function to calculate the dynamic body's size
 {
 	return (CmdPacket.Header.Length - HEADERSIZE - sizeof(uc));
 }
 
-char* MilestoneOne::PktDef::GetBodyData()
+char* PktDef::GetBodyData()
 {
 	return (CmdPacket.Data == nullptr ? nullptr : CmdPacket.Data);
 }
 
-int MilestoneOne::PktDef::GetPktCount()
+int PktDef::GetPktCount()
 {
 	return CmdPacket.Header.PktCount;
 }
 
-bool MilestoneOne::PktDef::CheckCRC(char* rawData, int bufferLength)
+bool PktDef::CheckCRC(char* rawData, int bufferLength)
 {
 	// Assumption: CRC value for the current CmdPacket is initialized
 	char* ptr = rawData;
@@ -236,7 +236,7 @@ bool MilestoneOne::PktDef::CheckCRC(char* rawData, int bufferLength)
 	return (counter == *ptr);
 }
 
-void MilestoneOne::PktDef::CalcCRC()
+void PktDef::CalcCRC()
 {
 	// Kindly ask ze pointer to point to the beginning of CmdPacket's header
 	char* ptr = (char*)&CmdPacket.Header;
@@ -299,7 +299,7 @@ void MilestoneOne::PktDef::CalcCRC()
 	CmdPacket.CRC = counter;
 }
 
-char* MilestoneOne::PktDef::GenPacket()
+char* PktDef::GenPacket()
 {
 	// Allocate memory for data transfer
 	RawBuffer = new char[GetLength()];
@@ -329,7 +329,7 @@ char* MilestoneOne::PktDef::GenPacket()
 	return RawBuffer;
 }
 
-MilestoneOne::PktDef::~PktDef()
+PktDef::~PktDef()
 {
 	// Need to use delete[] if the "new" keyword is used!
 	delete[] RawBuffer;

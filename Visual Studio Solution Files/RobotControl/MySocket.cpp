@@ -9,7 +9,7 @@
 
 /* Constructor that configures the socket and connection types as well as IP Address and Port number
 	as well as dynamically allocating memory for the receiving buffer. Servers are setup accordingly. */
-MilestoneTwo::MySocket::MySocket(SocketType newSocketType, std::string newIPAddr, int newPort, ConnectionType newConnectionType, int bufferLength)
+MySocket::MySocket(SocketType newSocketType, std::string newIPAddr, int newPort, ConnectionType newConnectionType, int bufferLength)
 {
 	// Start the Winsock library for our Socket
 	start_DLLS();
@@ -64,14 +64,14 @@ MilestoneTwo::MySocket::MySocket(SocketType newSocketType, std::string newIPAddr
 }
 
 // Destructor to deallocate dynamic data
-MilestoneTwo::MySocket::~MySocket()
+MySocket::~MySocket()
 {
 	delete[] Buffer;
 	Buffer = nullptr;
 }
 
 // Boots up the Windows socket libraries (to use functions like send, recv etc)
-void MilestoneTwo::MySocket::start_DLLS()
+void MySocket::start_DLLS()
 {
 	WSADATA wsaData;
 	if ((WSAStartup(MAKEWORD(2, 2), &wsaData)) != 0) {
@@ -81,7 +81,7 @@ void MilestoneTwo::MySocket::start_DLLS()
 }
 
 // Function used to establish a TCP/IP socket connection via a 3-way handshake
-void MilestoneTwo::MySocket::ConnectTCP()
+void MySocket::ConnectTCP()
 {
 	if (connectionType == TCP)
 	{
@@ -171,7 +171,7 @@ void MilestoneTwo::MySocket::ConnectTCP()
 }
 
 // Function used to disconnect an established TCP/IP socket connection via a 4-way handshake
-void MilestoneTwo::MySocket::DisconnectTCP()
+void MySocket::DisconnectTCP()
 {
 	if (bTCPConnect)
 	{
@@ -187,7 +187,7 @@ void MilestoneTwo::MySocket::DisconnectTCP()
 }
 
 // Function used to transmit a block of RAW data - works with both TCP and UDP
-void MilestoneTwo::MySocket::SendData(const char* rawData, int bufferLength)
+void MySocket::SendData(const char* rawData, int bufferLength)
 {
 	if (connectionType == TCP)
 	{
@@ -202,7 +202,7 @@ void MilestoneTwo::MySocket::SendData(const char* rawData, int bufferLength)
 
 /* Function used to receive data on the internal buffer then copy it to the argument buffer.
 Works with both TCP and UDP. */
-int MilestoneTwo::MySocket::GetData(char* rawData)
+int MySocket::GetData(char* rawData)
 {
 	int numOfBytesReceived = 0;
 	memset(Buffer, 0, MaxSize);
@@ -228,7 +228,7 @@ int MilestoneTwo::MySocket::GetData(char* rawData)
 }
 
 // Sets an IP Address - contains logic to prevent changes being made if a TCP/IP connection has been established or Welcome socket is open
-void MilestoneTwo::MySocket::SetIPAddr(std::string newIPAddress)
+void MySocket::SetIPAddr(std::string newIPAddress)
 {
 	// Only allow modification of our IP Address if there is NOT a connection already established
 	if (bTCPConnect || (GetType() == SERVER && WelcomeSocket != INVALID_SOCKET))
@@ -243,7 +243,7 @@ void MilestoneTwo::MySocket::SetIPAddr(std::string newIPAddress)
 }
 
 // Sets a Port number - contains logic to prevent changes being made if a TCP/IP connection has been established or Welcome socket is open
-void MilestoneTwo::MySocket::SetPortNo(int newPortNumber)
+void MySocket::SetPortNo(int newPortNumber)
 {
 	if (bTCPConnect || (GetType() == SERVER && WelcomeSocket != INVALID_SOCKET))
 	{
@@ -257,7 +257,7 @@ void MilestoneTwo::MySocket::SetPortNo(int newPortNumber)
 }
 
 // Sets a Socket Type - contains logic to prevent changes being made if a TCP/IP connection has been established or Welcome socket is open
-void MilestoneTwo::MySocket::SetType(SocketType newSocketType)
+void MySocket::SetType(SocketType newSocketType)
 {
 	if (bTCPConnect || (GetType() == SERVER && WelcomeSocket != INVALID_SOCKET))
 	{
@@ -271,23 +271,23 @@ void MilestoneTwo::MySocket::SetType(SocketType newSocketType)
 	}
 }
 
-std::string MilestoneTwo::MySocket::GetIPAddr()
+std::string MySocket::GetIPAddr()
 {
 	return IPAddr;
 }
 
-int MilestoneTwo::MySocket::GetPort()
+int MySocket::GetPort()
 {
 	return Port;
 }
 
-SocketType MilestoneTwo::MySocket::GetType()
+SocketType MySocket::GetType()
 {
 	return mySocket;
 }
 
 // Function used during debugging to display error codes from functions like send(), recv(), sendto() and recvfrom()
-void MilestoneTwo::MySocket::getWSAError()
+void MySocket::getWSAError()
 {
 	std::cout << "Last known error code of: " << WSAGetLastError() << std::endl;
 }
