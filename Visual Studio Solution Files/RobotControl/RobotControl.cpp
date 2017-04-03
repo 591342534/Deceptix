@@ -7,35 +7,73 @@
 
 #include "MySocket.h"
 #include "PktDef.h"
+#include "RobotControl.h"
 
 void TelemetryThreadLogic(std::string IPAddr, int Port)
 {
 	MySocket TelemetrySocket(SocketType::CLIENT, IPAddr, Port, ConnectionType::TCP, 100);
 	TelemetrySocket.ConnectTCP();	// Perform the 3-way handshake to connect to a TCP server
-	PktDef TelemetryPacket;
-
-	//ASSUMPTION: Packet body is structured in a specific sequence for parsing.
+	
+	// ASSUMPTION: Packet body is structured in a specific sequence for parsing.
 	char* RxBuffer = nullptr;
-	//Receive and process incoming telemetry packets from the Robot continuously
-	while (1) {
-		//Reset the pointer 
+
+	// Receive and process incoming Telemetry packets from the Robot forever
+	while (1)
+	{
+		// Delete the contents of RxBuffer from the previous Telemetry packet
 		delete [] RxBuffer;
 		RxBuffer = nullptr;
-		//Receive incoming Telemetry Packet
+
+		// Receive the incoming Telemetry data from the Robot
 		int bytesReceived = TelemetrySocket.GetData(RxBuffer);
-		if (TelemetryPacket.CheckCRC(RxBuffer, bytesReceived)) {
-			PktDef incomingTelPacket(RxBuffer);		//TODO: do we generate packet inside constructor? (GENPACKET function in constructor)
-			int dataSize = incomingTelPacket.CalculateBodyLength();
-			char* buffer = new char[dataSize];
-			buffer = incomingTelPacket.GetBodyData();
 
+		PktDef TelemetryPacket(RxBuffer);
 
+		try
+		{
+			// Calculate the CRC on our end and compare if the Robot's CRC is the same!
+			if (TelemetryPacket.CheckCRC(RxBuffer, bytesReceived))
+			{
+				// If the calculated CRC is good, move onto verification of the Header (AKA STATUS BIT SET!
+				if (TelemetryPacket.GetStatus())
+				{
+					// All checks have passed! Let's display the raw Telemetry data
 
+					TelemetryBody body;
+
+					// TODO: Upgrade from double to decimal for the Sonar Reading
+					char* ptr = RxBuffer;
+					
+					ptr += sizeof(CmdPacketHeader);
+
+					// Now we're at the beginning of the body (which is 5 bytes in length)
+					memcpy(&body.SensorData, ptr, sizeof(unsigned short));
+
+					ptr += sizeof(unsigned short);
+
+					memcpy(&body.ArmPositionData, ptr, sizeof(unsigned short));
+
+					ptr += sizeof(unsigned short);
+
+					// We're now at the beginning of the bit fields so let's copy them in!
+					body.Drive = ((*ptr) >> 0) & 0X01;
+					body.ArmUp = ((*ptr) >> 1) & 0X01;
+					body.ArmDown = ((*ptr) >> 2) & 0X01;
+					body.ClawOpen = ((*ptr) >> 3) & 0X01;
+					body.ClawClosed = ((*ptr) >> 4) & 0X01;
+				}
+				else { throw "Status bit was not set for Telemetry data. Dropping packet."; }
+			}
+			else { throw "An invalid CRC was detected. Dropping packet."; }
 		}
-
-
-
-
+		catch (const char* errorMessage)
+		{
+			std::cerr << errorMessage << std::endl;
+		}
+		catch (...)
+		{
+			std::cerr << "ERROR: An unknown error was caught!" << std::endl;
+		}
 	}
 }
 

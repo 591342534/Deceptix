@@ -1,0 +1,36 @@
+/*
+	Title:			BTN415 Project - Robotic Control Software - Winter 2016
+	Author(s):		Sean Prashad, Hao Chen, Stephen Noble
+	Student ID:		029-736-105, 022-905-152, 018-619-155
+	Description:	~ Header file containing a MotorBody structure
+*/
+
+#ifndef PROJECT_TELEMETRYBODY_H
+#define PROJECT_TELEMETRYBODY_H
+
+struct TelemetryBody
+{
+private:
+public:
+	unsigned short SensorData;			// Holds the Sonar Sensor Data (2 bytes #worth)
+	unsigned short ArmPositionData;		// Holds a value that specifies the duration of a command (in seconds)
+	unsigned char Drive : 1;
+	unsigned char ArmUp : 1;
+	unsigned char ArmDown : 1;
+	unsigned char ClawOpen : 1;
+	unsigned char ClawClosed : 1;
+	unsigned char Padding : 2;
+
+	TelemetryBody()
+	{
+		SensorData = 0;
+		ArmPositionData = 0;
+		Drive = 0;
+		ArmUp = 0;
+		ArmDown = 0;
+		ClawOpen = 0;
+		ClawClosed = 0;
+		Padding = 0;
+	}
+};
+#endif

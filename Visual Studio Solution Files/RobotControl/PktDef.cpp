@@ -201,6 +201,11 @@ int PktDef::CalculateBodyLength()		// Additional function to calculate the dynam
 	return (CmdPacket.Header.Length - HEADERSIZE - sizeof(uc));
 }
 
+bool PktDef::GetStatus()
+{
+	return CmdPacket.Header.Status;
+}
+
 char* PktDef::GetBodyData()
 {
 	return (CmdPacket.Data == nullptr ? nullptr : CmdPacket.Data);
