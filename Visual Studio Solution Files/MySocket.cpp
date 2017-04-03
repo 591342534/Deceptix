@@ -266,6 +266,8 @@ void MilestoneTwo::MySocket::SetType(SocketType newSocketType)
 	else
 	{
 		mySocket = newSocketType;
+
+		// TODO: Implement logic for switching between a TCP client/server
 	}
 }
 

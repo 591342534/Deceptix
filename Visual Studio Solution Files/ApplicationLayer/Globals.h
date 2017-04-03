@@ -44,8 +44,6 @@ namespace MilestoneOne {
 		NACK = 404
 	};
 
-	// Const integers to define all of the possible commands for the MotorBody structure
-
 	// DRIVE command parameter definitions
 	const ui FORWARD = 1;
 	const ui BACKWARD = 2;
