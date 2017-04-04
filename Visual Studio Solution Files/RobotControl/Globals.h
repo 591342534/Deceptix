@@ -45,25 +45,11 @@ enum CmdType				// Enumeration to define the command types for the Robot
 	NACK = 404
 };
 
-//// A map for retrieving CmdType value
-//static std::map<int, CmdType> mapOfCmdTypes = {
-//	{ 0, CmdType::DRIVE },
-//	{ 1, CmdType::SLEEP },
-//	{ 2, CmdType::ARM },
-//	{ 3, CmdType::CLAW },
-//	{ 4, CmdType::ACK }
-//};
-//
-//// Return the correct CmdType for command
-//static CmdType cmdTypeEquivalent(int command) {
-//	return mapOfCmdTypes[command];
-//}
-
 // DRIVE command parameter definitions
 const ui FORWARD = 1;
 const ui BACKWARD = 2;
-const ui LEFT = 3;
-const ui RIGHT = 4;
+const ui RIGHT = 3;
+const ui LEFT = 4;
 
 // ARM command parameter definitions
 const ui UP = 5;
@@ -77,4 +63,26 @@ const ui CLOSE = 8;
 const ui HEADERSIZE = 6;
 const ui HEADERSIZEOFFSET = 2;		// To account for the extra bytes added after the CmdPacket.Header structure
 
+// A map for retrieving CmdType value
+static std::map<CmdType, std::string> mapOfCmdTypes = {
+	{ CmdType::DRIVE, "DRIVE" },
+	{ CmdType::SLEEP, "SLEEP" },
+	{ CmdType::ARM, "ARM" },
+	{ CmdType::CLAW, "CLAW" },
+	{ CmdType::ACK , "ACK"},
+	{ CmdType::STATUS , "STATUS"},
+	{ CmdType::NACK , "NACK"}
+};
+
+// Return the correct CmdType for command
+static std::string cmdTypeEquivalent(CmdType commandType) {
+	return mapOfCmdTypes[commandType];
+}
+
+// Function to display an integer value to it's respective time counterpart
+void static ConvertToMinutes(int value, int &minute, int &seconds)
+{
+	minute = (value % 3600) / 60;
+	seconds = value % 60;
+}
 #endif

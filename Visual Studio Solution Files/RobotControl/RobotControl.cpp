@@ -8,7 +8,6 @@
 #include "MySocket.h"
 #include "PktDef.h"
 #include "RobotControl.h"
-#include <stdlib.h>
 
 void TelemetryThreadLogic(std::string IPAddr, int Port)
 {
@@ -47,12 +46,12 @@ void TelemetryThreadLogic(std::string IPAddr, int Port)
 						std::cout << std::hex << (int)RxBuffer[i] << ", ";
 					}
 
+					// Reset the output back to standard values
 					std::cout << std::dec << std::endl;
 
 					// All checks have passed! Let's display the raw Telemetry data
 					TelemetryBody body;
 
-					// TODO: Upgrade from double to decimal for the Sonar Reading
 					char* ptr = RxBuffer + sizeof(int) + (sizeof(char) * 2);
 
 					/* Now we're at the beginning of the body (which is 5 bytes in length),
@@ -76,7 +75,7 @@ void TelemetryThreadLogic(std::string IPAddr, int Port)
 					body.ClawClosed = ((*ptr) >> 4) & 0X01;
 
 					// Display the Sonar reading followed by the Arm reading
-					std::cout << "Sonar Value = " << body.SensorData << ",  ";		//TODO: DECIMAL VALUE
+					std::cout << "Sonar Value = " << body.SensorData << ",  ";
 
 					std::cout << "Arm Position = " << body.ArmPositionData << std::endl;
 
@@ -106,7 +105,7 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 	PktDef CommandPacket;
 	char* RxBuffer = nullptr;
 	char* TxBuffer = nullptr;
-	bool sleepCondition = false;
+	int minutes = 0, seconds = 0;
 
 	MySocket CommandSocket(SocketType::CLIENT, IPAddr, Port, ConnectionType::TCP, 100);
 	CommandSocket.ConnectTCP();			// Perform the 3-way handshake to connect to a TCP server
@@ -116,8 +115,6 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 
 	while (1)
 	{
-		// TODO: Get all of the necessary data from the user
-
 		/*
 			Consider commands the user can enter:
 
@@ -132,7 +129,7 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 		*/
 
 		std::cout << "Select a command to tell Megatron to do:" << std::endl << std::endl;
-		std::cout << "0 - DRIVE\n2 - ARM\n3 - CLAW\n1 - SLEEP" << std::endl;
+		std::cout << "0 - DRIVE\n1 - SLEEP\n2 - ARM\n3 - CLAW" << std::endl;
 
 		// Get the user's choice then act upon it - convert it to an integer
 		int commandType = -1;		/* http://stackoverflow.com/questions/13421965/using-cin-get-to-get-an-integer */
@@ -167,31 +164,30 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 			else
 			{
 				// User wants to enter a DRIVE, ARM or CLAW command! Get a MotorBody struct ready!
+
 				MotorBody motorBody;
 				int direction = 0, duration = 0;
 
 				switch (commandTypeEnum)
 				{
-				case 0:	// Drive case
+				case 0:
 					std::cout << "Choose from the following directions:" << std::endl;
 					std::cout << "1 - FORWARD\n2 - BACKWARD\n3 - RIGHT\n4 - LEFT" << std::endl;
-
-					// TODO AFTER LUNCH: FIX UP USER INPUT!!!!!!! DURATION & DIRECTION
 
 					std::cin >> direction;
 
 					switch (direction)
 					{
-					case 1:
+					case FORWARD:
 						motorBody.Direction = FORWARD;
 						break;
-					case 2:
+					case BACKWARD:
 						motorBody.Direction = BACKWARD;
 						break;
-					case 3:
+					case RIGHT:
 						motorBody.Direction = RIGHT;
 						break;
-					case 4:
+					case LEFT:
 						motorBody.Direction = LEFT;
 						break;
 					default:
@@ -200,7 +196,7 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 
 					std::cout << "Enter the duration for the DRIVE command: ";
 					std::cin >> duration;
-					
+
 					motorBody.Duration = (uc)duration;
 					break;
 				case 2:
@@ -211,10 +207,10 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 
 					switch (direction)
 					{
-					case 5:
+					case UP:
 						motorBody.Direction = UP;
 						break;
-					case 6:
+					case DOWN:
 						motorBody.Direction = DOWN;
 						break;
 					default:
@@ -226,16 +222,16 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 				case 3:
 
 					std::cout << "Choose from the following directions:" << std::endl;
-					std::cout << "5 - OPEN\n6 - CLOSE" << std::endl;
+					std::cout << "7 - OPEN\n8 - CLOSE" << std::endl;
 
 					std::cin >> direction;
 
 					switch (direction)
 					{
-					case 5:
+					case OPEN:
 						motorBody.Direction = OPEN;
 						break;
-					case 6:
+					case CLOSE:
 						motorBody.Direction = CLOSE;
 						break;
 					default:
@@ -247,6 +243,9 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 				}
 
 				CommandPacket.SetBodyData(reinterpret_cast<char*>(&motorBody), sizeof(MotorBody));
+
+				// Call the user-define time formatting function
+				ConvertToMinutes(motorBody.Duration, minutes, seconds);
 			}
 		}
 		else
@@ -271,9 +270,11 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 
 		CommandSocket.SendData(TxBuffer, CommandPacket.GetLength());
 
-		// Wait for Senpai to acknowledge us
+		// Clean up any existing data inside the Buffer
 		delete[] RxBuffer;
 		RxBuffer = new char[CommandPacket.GetLength()];
+		
+		// Wait for Senpai to acknowledge us
 		int size = CommandSocket.GetData(RxBuffer);
 
 		PktDef RobotPacket(RxBuffer);
@@ -293,11 +294,10 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 													// Break from the Megatron's grasp
 					break;
 				}
-				else		// Megatron acknowledged our request, let's display what he did
+				else		// Megatron acknowledged our request, let's display what he said
 				{
-					std::cout << "Megatron responded with an ACK of: " << RobotPacket.GetAck() << " for our " << RobotPacket.GetCmd() << " command" << std::endl;
-
-					// TODO: Need to add string mapping to enumeration for display purposes
+					std::cout << std::endl << "*** Megatron responded with an ACK of: " << RobotPacket.GetAck() << " for our " << cmdTypeEquivalent(RobotPacket.GetCmd())
+						<< " command ***" << std::endl << std::endl;
 				}
 			}
 			else
@@ -312,7 +312,7 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 		}
 		else
 		{
-			std::cout << "Megatron responded with random shit!" << std::endl;
+			std::cout << "Megatron responded with an unknown error!" << std::endl;
 		}
 	}
 }
