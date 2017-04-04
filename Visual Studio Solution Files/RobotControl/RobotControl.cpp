@@ -38,8 +38,12 @@ void TelemetryThreadLogic(std::string IPAddr, int Port)
 				// If the calculated CRC is good, move onto verification of the Header (AKA STATUS BIT SET!
 				if (TelemetryPacket.GetStatus())
 				{
-					// Display RAW data packet
-					std::cout << "RAW Data: " << RxBuffer << std::endl;
+					for (int i = 0; i < bytesReceived; i++)
+					{
+						std::cout << std::hex << (int)RxBuffer[i] << ", ";
+					}
+
+					std::cout << std::dec << std::endl;
 
 					// All checks have passed! Let's display the raw Telemetry data
 					TelemetryBody body;
