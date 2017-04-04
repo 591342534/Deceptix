@@ -38,6 +38,10 @@ void TelemetryThreadLogic(std::string IPAddr, int Port)
 				// If the calculated CRC is good, move onto verification of the Header (AKA STATUS BIT SET!
 				if (TelemetryPacket.GetStatus())
 				{
+					std::cout << std::endl << std::endl << "RECEIVED TELEMETRY PACKET:" << std::endl;
+
+					std::cout << "RAW Data Bytes: ";
+
 					for (int i = 0; i < bytesReceived; i++)
 					{
 						std::cout << std::hex << (int)RxBuffer[i] << ", ";
@@ -49,7 +53,7 @@ void TelemetryThreadLogic(std::string IPAddr, int Port)
 					TelemetryBody body;
 
 					// TODO: Upgrade from double to decimal for the Sonar Reading
-					char* ptr = (RxBuffer + sizeof(CmdPacketHeader));
+					char* ptr = RxBuffer + sizeof(int) + (sizeof(char) * 2);
 
 					/* Now we're at the beginning of the body (which is 5 bytes in length),
 						let's copy the first section - Sonar Sensor data */
@@ -71,16 +75,14 @@ void TelemetryThreadLogic(std::string IPAddr, int Port)
 					body.ClawOpen = ((*ptr) >> 3) & 0X01;
 					body.ClawClosed = ((*ptr) >> 4) & 0X01;
 
-					// TODO: Setw() and format the output nicely
-
 					// Display the Sonar reading followed by the Arm reading
-					std::cout << "Sonar Reading of: " << body.SensorData << std::endl;		//TODO: DECIMAL VALUE
+					std::cout << "Sonar Value = " << body.SensorData << ",  ";		//TODO: DECIMAL VALUE
 
-					std::cout << "Arm Reading of: " << body.ArmPositionData << std::endl;
+					std::cout << "Arm Position = " << body.ArmPositionData << std::endl;
 
-					std::cout << "Drive flag is: " << body.Drive << std::endl;
+					std::cout << "Drive flag is: " << (int)body.Drive << std::endl;
 
-					(body.ArmUp) ? std::cout << "Arm is Up, " : std::cout << "Arm is Down, ";
+					(body.ArmUp) ? std::cout << "Arm is Up" << std::endl : std::cout << "Arm is Down" << std::endl;
 
 					(body.ClawOpen) ? std::cout << "Claw is Open" << std::endl : std::cout << "Claw is Closed" << std::endl;
 				}
@@ -174,6 +176,7 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 					std::cout << "Choose from the following directions:" << std::endl;
 					std::cout << "1 - FORWARD\n2 - BACKWARD\n3 - RIGHT\n4 - LEFT" << std::endl;
 
+					// TODO AFTER LUNCH: FIX UP USER INPUT!!!!!!! DURATION & DIRECTION
 
 					std::cin >> direction;
 

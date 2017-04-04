@@ -12,14 +12,14 @@ struct TelemetryBody
 {
 private:
 public:
-	unsigned short SensorData;			// Holds the Sonar Sensor Data (2 bytes #worth)
-	unsigned short ArmPositionData;		// Holds a value that specifies the duration of a command (in seconds)
-	unsigned char Drive : 1;
-	unsigned char ArmUp : 1;
-	unsigned char ArmDown : 1;
-	unsigned char ClawOpen : 1;
-	unsigned char ClawClosed : 1;
-	unsigned char Padding : 2;
+	us SensorData;			// Holds the Sonar Sensor Data (2 bytes #worth)
+	us ArmPositionData;		// Holds a value that specifies the duration of a command (in seconds)
+	uc Drive : 1;
+	uc ArmUp : 1;
+	uc ArmDown : 1;
+	uc ClawOpen : 1;
+	uc ClawClosed : 1;
+	uc Padding : 2;
 
 	TelemetryBody()
 	{
