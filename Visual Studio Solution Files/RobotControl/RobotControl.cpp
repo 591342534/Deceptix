@@ -8,6 +8,7 @@
 #include "MySocket.h"
 #include "PktDef.h"
 #include "RobotControl.h"
+#include <stdlib.h>
 
 void TelemetryThreadLogic(std::string IPAddr, int Port)
 {
@@ -15,14 +16,13 @@ void TelemetryThreadLogic(std::string IPAddr, int Port)
 	TelemetrySocket.ConnectTCP();	// Perform the 3-way handshake to connect to a TCP server
 
 	// ASSUMPTION: Packet body is structured in a specific sequence for parsing
-	char* RxBuffer = nullptr;
+	char* RxBuffer = new char[DEFAULT_SIZE];
 
 	// Receive and process incoming Telemetry packets from the Megatron forever
 	while (1)
 	{
 		// Delete the contents of RxBuffer from the previous Telemetry packet
-		delete[] RxBuffer;
-		RxBuffer = nullptr;
+		memset(RxBuffer, 0, DEFAULT_SIZE);
 
 		// Receive the incoming Telemetry data from the Megatron
 		int bytesReceived = TelemetrySocket.GetData(RxBuffer);
@@ -130,6 +130,8 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 
 		// Get the user's choice then act upon it
 		int commandType = std::cin.get();
+		
+		// TODO: START DEBUGGING HERE TOMORROW - APRIL 4, 2017 - Not passing the right user value!
 
 		if (commandType == (0 || 2 || 3 || 1))
 		{
@@ -242,10 +244,10 @@ int main(int argc, char *argv[])
 	ExeComplete = false;
 
 	// First argument is the function we want to call (aka the logic), arguments thereafter are the ARGUMENTS to that specific function
-	std::thread(CommandThreadLogic, argv[2], (int)argv[3]).detach();
+	std::thread(CommandThreadLogic, argv[1], std::atoi(argv[2])).detach();
 
 	// Telemetry thread will use the same IP address as the command thread. 
-	std::thread(TelemetryThreadLogic, argv[2], (int)argv[4]).detach();
+	std::thread(TelemetryThreadLogic, argv[1], std::atoi(argv[3])).detach();
 
 	// Loop forever until ExeComplete is true!
 	while (!ExeComplete) {}
