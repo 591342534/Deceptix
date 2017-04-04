@@ -209,7 +209,8 @@ bool PktDef::GetStatus()
 bool PktDef::CheckNACK()
 {
 	return (CmdPacket.Header.Drive && CmdPacket.Header.Status && CmdPacket.Header.Sleep
-		&& CmdPacket.Header.Arm && CmdPacket.Header.Claw && CmdPacket.Header.Ack && CmdPacket.Data == nullptr);
+		&& CmdPacket.Header.Arm && CmdPacket.Header.Claw && CmdPacket.Header.Ack && CmdPacket.Data == nullptr
+		&& CmdPacket.Header.Length == 7);
 }
 
 char* PktDef::GetBodyData()

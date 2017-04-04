@@ -13,25 +13,26 @@ void TelemetryThreadLogic(std::string IPAddr, int Port)
 {
 	MySocket TelemetrySocket(SocketType::CLIENT, IPAddr, Port, ConnectionType::TCP, 100);
 	TelemetrySocket.ConnectTCP();	// Perform the 3-way handshake to connect to a TCP server
-	
-	// ASSUMPTION: Packet body is structured in a specific sequence for parsing.
+
+	// ASSUMPTION: Packet body is structured in a specific sequence for parsing
 	char* RxBuffer = nullptr;
 
-	// Receive and process incoming Telemetry packets from the Robot forever
+	// Receive and process incoming Telemetry packets from the Megatron forever
 	while (1)
 	{
 		// Delete the contents of RxBuffer from the previous Telemetry packet
-		delete [] RxBuffer;
+		delete[] RxBuffer;
 		RxBuffer = nullptr;
 
-		// Receive the incoming Telemetry data from the Robot
+		// Receive the incoming Telemetry data from the Megatron
 		int bytesReceived = TelemetrySocket.GetData(RxBuffer);
 
+		// Create a packet based on the data received from Megatron
 		PktDef TelemetryPacket(RxBuffer);
 
 		try
 		{
-			// Calculate the CRC on our end and compare if the Robot's CRC is the same!
+			// Calculate the CRC on our end and compare if the Megatron's CRC is the same!
 			if (TelemetryPacket.CheckCRC(RxBuffer, bytesReceived))
 			{
 				// If the calculated CRC is good, move onto verification of the Header (AKA STATUS BIT SET!
@@ -41,22 +42,23 @@ void TelemetryThreadLogic(std::string IPAddr, int Port)
 					std::cout << "RAW Data: " << RxBuffer << std::endl;
 
 					// All checks have passed! Let's display the raw Telemetry data
-
 					TelemetryBody body;
 
 					// TODO: Upgrade from double to decimal for the Sonar Reading
-					char* ptr = RxBuffer;
-					
-					ptr += sizeof(CmdPacketHeader);
+					char* ptr = (RxBuffer + sizeof(CmdPacketHeader));
 
-					// Now we're at the beginning of the body (which is 5 bytes in length)
-					memcpy(&body.SensorData, ptr, sizeof(unsigned short));
+					/* Now we're at the beginning of the body (which is 5 bytes in length),
+						let's copy the first section - Sonar Sensor data */
+					memcpy(&body.SensorData, ptr, sizeof(us));
 
-					ptr += sizeof(unsigned short);
+					// Move onto the Arm Position data
+					ptr += sizeof(us);
 
-					memcpy(&body.ArmPositionData, ptr, sizeof(unsigned short));
+					// Copy in the the Arm Position data
+					memcpy(&body.ArmPositionData, ptr, sizeof(us));
 
-					ptr += sizeof(unsigned short);
+					// Move past the Arm Position data and onto the bit fields
+					ptr += sizeof(us);
 
 					// We're now at the beginning of the bit fields so let's copy them in!
 					body.Drive = ((*ptr) >> 0) & 0X01;
@@ -68,13 +70,13 @@ void TelemetryThreadLogic(std::string IPAddr, int Port)
 					// TODO: Setw() and format the output nicely
 
 					// Display the Sonar reading followed by the Arm reading
-					std::cout << "Sonar Reading of: " << body.SensorData << std::endl;
+					std::cout << "Sonar Reading of: " << body.SensorData << std::endl;		//TODO: DECIMAL VALUE
 
 					std::cout << "Arm Reading of: " << body.ArmPositionData << std::endl;
 
 					std::cout << "Drive flag is: " << body.Drive << std::endl;
 
-					(body.ArmUp) ? std::cout << "Arm is Up," : std::cout << "Arm is Down,";
+					(body.ArmUp) ? std::cout << "Arm is Up, " : std::cout << "Arm is Down, ";
 
 					(body.ClawOpen) ? std::cout << "Claw is Open" << std::endl : std::cout << "Claw is Closed" << std::endl;
 				}
@@ -105,14 +107,67 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 
 	// Set the PktCount number to 0 initially then each subsequent time we'll need to increment it
 	CommandPacket.SetPktCount(0);
-	
+
 	while (1)
 	{
 		// TODO: Get all of the necessary data from the user
-		//std::cout << "Please enter the details of the packet." << std::endl;
-		//std::cout << "Format is as follows:" << std::endl << std::endl;
-		//std::cout << "CommandType: " << std::endl << std::endl;
-		
+
+		/*
+			Consider commands the user can enter:
+
+			Drive - requires drive bit to be set in header AND
+					a body consisting of a MOTORBODY struct!
+
+			Arm - requires arm bit to be set in header AND
+			a body consisting of a MOTORBODY struct!
+
+			Claw - requires claw bit to be set in header AND
+			a body consisting of a MOTORBODY struct!
+		*/
+
+		std::cout << "Select a command to tell Megatron to do:" << std::endl << std::endl;
+		std::cout << "0 - DRIVE\n2 - ARM\n3 - CLAW\n1 - SLEEP" << std::endl;
+
+		// Get the user's choice then act upon it
+		int commandType = std::cin.get();
+
+		if (commandType == (0 || 2 || 3 || 1))
+		{
+			// User wants to enter a DRIVE, ARM or CLAW command! Get a MotorBody struct ready!
+
+			MotorBody motorBody;
+
+			// ASSUMPTION: USER IS PERFECT AND INPUT IS NOICE
+			std::cout << "Enter a Direction and Duration value (space separated): ";
+			motorBody.Direction = std::cin.get();
+			motorBody.Duration = std::cin.get();
+
+			CmdType commandTypeEnum;
+
+			switch (commandType)
+			{
+			case 0:
+				commandTypeEnum = DRIVE;
+				break;
+			case 1:
+				commandTypeEnum = SLEEP;
+				break;
+			case 2:
+				commandTypeEnum = ARM;
+				break;
+			case 3:
+				commandTypeEnum = CLAW;
+				break;
+			}
+
+			CommandPacket.SetCmd(commandTypeEnum);
+			CommandPacket.SetBodyData(reinterpret_cast<char*>(&motorBody), sizeof(MotorBody));
+		}
+		else
+		{
+			std::cout << "YOU STUPID" << std::endl;
+		}
+
 		// Generate the CRC before sending out packet
 		CommandPacket.CalcCRC();
 
@@ -136,7 +191,6 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 				// Check if the SLEEP command we sent was RETURNED AND ACKNOWLEDGED by Megatron
 				if ((CommandPacket.GetCmd() == SLEEP && RobotPacket.GetCmd() == SLEEP) && RobotPacket.GetAck())
 				{
-
 					ExeComplete = true;
 
 					CommandSocket.DisconnectTCP();	// Disconnect the CommandSocket
@@ -148,7 +202,7 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 				{
 					std::cout << "Megatron responded with an ACK of: " << RobotPacket.GetAck() << " for our " << RobotPacket.GetCmd() << " command" << std::endl;
 
-					// Note: Need to add string mapping to enumeration for display purposes
+					// TODO: Need to add string mapping to enumeration for display purposes
 				}
 			}
 			else
@@ -160,6 +214,10 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 		else if (RobotPacket.CheckNACK())	// We received a NACK from the Megatron, aka my dating life
 		{
 			std::cout << "Megatron responded with a NACK!" << std::endl;
+		}
+		else
+		{
+			std::cout << "Megatron responded with random shit!" << std::endl;
 		}
 	}
 }
@@ -188,7 +246,7 @@ int main(int argc, char *argv[])
 
 	// Telemetry thread will use the same IP address as the command thread. 
 	std::thread(TelemetryThreadLogic, argv[2], (int)argv[4]).detach();
-		
+
 	// Loop forever until ExeComplete is true!
-	while (!ExeComplete) { }
+	while (!ExeComplete) {}
 }

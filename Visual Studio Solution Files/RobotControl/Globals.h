@@ -10,6 +10,7 @@
 
 /* Global list of typedef aliases found below */
 typedef	unsigned int ui;
+typedef unsigned short us;
 typedef unsigned char uc;
 
 #include <iostream>
@@ -42,6 +43,25 @@ enum CmdType				// Enumeration to define the command types for the Robot
 	STATUS = 200,
 	NACK = 404
 };
+
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ TODO: MAP TO OUR ENUMS ABOVE, NOT ARAIG SENSORS!!!!!!!!!!!!!!!!!!!!!! @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+///* Returns the equivalent Location enum when reading from a file */
+//static Location locationEquivalent(std::string const& convertStr) {
+//	if (convertStr == "abs") return absolute;
+//	else if (convertStr == "front") return front;
+//	else if (convertStr == "back") return back;
+//	else if (convertStr == "traps") return traps;
+//	else return unspecified;
+//}
+//
+//static std::map<Location, const char*> locationList = {
+//	{ unspecified , "not specified" },
+//	{ absolute, "absolute" },
+//	{ front, "front" },
+//	{ back, "back" },
+//	{ traps, "traps" }
+//};
 
 // DRIVE command parameter definitions
 const ui FORWARD = 1;
