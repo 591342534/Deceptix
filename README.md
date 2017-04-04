@@ -6,6 +6,8 @@
 
 **Project Photos**:
 
+![Decepticon Collage View](./Images/Decepticon_Collage_View.JPG "Decepticon Collage View")
+
 ![Decepticon Front View](./Images/Decepticon_Front_View.JPG "Decepticon Front View")
 
 ![Decepticon Side View](./Images/Decepticon_Side_View.JPG "Decepticon Side View")
