@@ -128,22 +128,12 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 		std::cout << "Select a command to tell Megatron to do:" << std::endl << std::endl;
 		std::cout << "0 - DRIVE\n2 - ARM\n3 - CLAW\n1 - SLEEP" << std::endl;
 
-		// Get the user's choice then act upon it
-		int commandType = std::cin.get();
-		
-		// TODO: START DEBUGGING HERE TOMORROW - APRIL 4, 2017 - Not passing the right user value!
+		// Get the user's choice then act upon it - convert it to an integer
+		int commandType = -1;		/* http://stackoverflow.com/questions/13421965/using-cin-get-to-get-an-integer */
+		std::cin >> commandType;
 
-		if (commandType == (0 || 2 || 3 || 1))
+		if ((commandType == 0) || (commandType == 1) || (commandType == 2) || (commandType == 3))
 		{
-			// User wants to enter a DRIVE, ARM or CLAW command! Get a MotorBody struct ready!
-
-			MotorBody motorBody;
-
-			// ASSUMPTION: USER IS PERFECT AND INPUT IS NOICE
-			std::cout << "Enter a Direction and Duration value (space separated): ";
-			motorBody.Direction = std::cin.get();
-			motorBody.Duration = std::cin.get();
-
 			CmdType commandTypeEnum;
 
 			switch (commandType)
@@ -163,14 +153,108 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 			}
 
 			CommandPacket.SetCmd(commandTypeEnum);
-			CommandPacket.SetBodyData(reinterpret_cast<char*>(&motorBody), sizeof(MotorBody));
+
+			if (commandTypeEnum == SLEEP)
+			{
+				CommandPacket.SetBodyData(nullptr, 0);	// Clear the body since it's a SLEEP command
+			}
+			else
+			{
+				// User wants to enter a DRIVE, ARM or CLAW command! Get a MotorBody struct ready!
+				MotorBody motorBody;
+				int direction = 0, duration = 0;
+
+				switch (commandTypeEnum)
+				{
+				case 0:	// Drive case
+					std::cout << "Choose from the following directions:" << std::endl;
+					std::cout << "1 - FORWARD\n2 - BACKWARD\n3 - RIGHT\n4 - LEFT" << std::endl;
+
+
+					std::cin >> direction;
+
+					switch (direction)
+					{
+					case 1:
+						motorBody.Direction = FORWARD;
+						break;
+					case 2:
+						motorBody.Direction = BACKWARD;
+						break;
+					case 3:
+						motorBody.Direction = RIGHT;
+						break;
+					case 4:
+						motorBody.Direction = LEFT;
+						break;
+					default:
+						break;
+					}
+
+					std::cout << "Enter the duration for the DRIVE command: ";
+					std::cin >> duration;
+					
+					motorBody.Duration = (uc)duration;
+					break;
+				case 2:
+					std::cout << "Choose from the following directions:" << std::endl;
+					std::cout << "5 - UP\n6 - DOWN" << std::endl;
+
+					std::cin >> direction;
+
+					switch (direction)
+					{
+					case 5:
+						motorBody.Direction = UP;
+						break;
+					case 6:
+						motorBody.Direction = DOWN;
+						break;
+					default:
+						break;
+					}
+
+					motorBody.Duration = 0;
+					break;
+				case 3:
+
+					std::cout << "Choose from the following directions:" << std::endl;
+					std::cout << "5 - OPEN\n6 - CLOSE" << std::endl;
+
+					std::cin >> direction;
+
+					switch (direction)
+					{
+					case 5:
+						motorBody.Direction = OPEN;
+						break;
+					case 6:
+						motorBody.Direction = CLOSE;
+						break;
+					default:
+						break;
+					}
+
+					motorBody.Duration = 0;
+					break;
+				}
+
+				CommandPacket.SetBodyData(reinterpret_cast<char*>(&motorBody), sizeof(MotorBody));
+			}
 		}
 		else
 		{
-			std::cout << "YOU STUPID" << std::endl;
+			std::cout << "SOMETHING WENT WRONG!" << std::endl;
 		}
 
-		// Generate the CRC before sending out packet
+		/*
+			Generate the CRC before sending out packet!
+
+			NOTE: Body is stored as unsigned char, aka the ASCII equivalent
+			to what our user entered. If the user entered "1" and "2" for the Motorbody,
+			it stores the ASCII equivalent which is'31' and '32'. This results in the
+			number of 1's being different than what we expected.
+		*/
 		CommandPacket.CalcCRC();
 
 		TxBuffer = CommandPacket.GenPacket();
@@ -181,6 +265,8 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 		CommandSocket.SendData(TxBuffer, CommandPacket.GetLength());
 
 		// Wait for Senpai to acknowledge us
+		delete[] RxBuffer;
+		RxBuffer = new char[CommandPacket.GetLength()];
 		int size = CommandSocket.GetData(RxBuffer);
 
 		PktDef RobotPacket(RxBuffer);

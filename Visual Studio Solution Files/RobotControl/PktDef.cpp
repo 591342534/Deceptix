@@ -83,20 +83,6 @@ PktDef::PktDef(char* rawData)		// Constructor called when we receive a stream of
 	// Calculate the CRC and store it inside CmdPacket.Tail
 	CalcCRC();
 
-	/*
-		We need to call GenPacket() to make sure that all of our data is sequential.
-		We MAY have a body, CmdPacket.Data, and if we try to pass in CmdPacket, our data will
-		not be sequential. Therefore, generate the packet which will copy everything sequentially
-		inside RawBuffer.
-	*/
-	GenPacket();
-
-	// Verify if the calculated CRC is valid, if not then call the default constructor
-	if (!CheckCRC(RawBuffer, CmdPacket.Header.Length))
-	{
-		PktDef();
-	}
-
 	// Because we're good students :)
 	ptr = nullptr;
 }

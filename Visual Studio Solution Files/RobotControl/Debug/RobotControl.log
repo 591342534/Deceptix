@@ -1,4 +1,6 @@
 ﻿  RobotControl.cpp
-c:\users\sean\desktop\version-control\academic projects\decepticon_communication_software\visual studio solution files\robotcontrol\robotcontrol.cpp(136): warning C4805: '==': unsafe mix of type 'int' and type 'bool' in operation
+  PktDef.cpp
+  MySocket.cpp
+  Generating Code...
   RobotControl.vcxproj -> C:\Users\Sean\Desktop\version-control\Academic Projects\Decepticon_Communication_Software\Visual Studio Solution Files\Debug\RobotControl.exe
   RobotControl.vcxproj -> C:\Users\Sean\Desktop\version-control\Academic Projects\Decepticon_Communication_Software\Visual Studio Solution Files\Debug\RobotControl.pdb (Full PDB)

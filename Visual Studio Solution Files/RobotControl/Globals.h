@@ -16,6 +16,7 @@ typedef unsigned char uc;
 #include <iostream>
 #include <string>
 #include <thread>
+#include <map>
 
 /* Default namespace */
 enum SocketType
@@ -44,24 +45,19 @@ enum CmdType				// Enumeration to define the command types for the Robot
 	NACK = 404
 };
 
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ TODO: MAP TO OUR ENUMS ABOVE, NOT ARAIG SENSORS!!!!!!!!!!!!!!!!!!!!!! @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-///* Returns the equivalent Location enum when reading from a file */
-//static Location locationEquivalent(std::string const& convertStr) {
-//	if (convertStr == "abs") return absolute;
-//	else if (convertStr == "front") return front;
-//	else if (convertStr == "back") return back;
-//	else if (convertStr == "traps") return traps;
-//	else return unspecified;
-//}
-//
-//static std::map<Location, const char*> locationList = {
-//	{ unspecified , "not specified" },
-//	{ absolute, "absolute" },
-//	{ front, "front" },
-//	{ back, "back" },
-//	{ traps, "traps" }
+//// A map for retrieving CmdType value
+//static std::map<int, CmdType> mapOfCmdTypes = {
+//	{ 0, CmdType::DRIVE },
+//	{ 1, CmdType::SLEEP },
+//	{ 2, CmdType::ARM },
+//	{ 3, CmdType::CLAW },
+//	{ 4, CmdType::ACK }
 //};
+//
+//// Return the correct CmdType for command
+//static CmdType cmdTypeEquivalent(int command) {
+//	return mapOfCmdTypes[command];
+//}
 
 // DRIVE command parameter definitions
 const ui FORWARD = 1;
