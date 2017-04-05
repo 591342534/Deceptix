@@ -1,8 +1,8 @@
 /*
-	Title:			BTN415 Project - Robotic Control Software - Winter 2016
-	Author(s):		Sean Prashad, Hao Chen, Stephen Noble
-	Student ID:		029-736-105, 022-905-152, 018-619-155
-	Description:	Implementation file for RobotControl.h
+Title:			BTN415 Project - Robotic Control Software - Winter 2016
+Author(s):		Sean Prashad, Hao Chen, Stephen Noble
+Student ID:		029-736-105, 022-905-152, 018-619-155
+Description:	Implementation file for RobotControl.h
 */
 
 #include "RobotControl.h"
@@ -12,7 +12,7 @@ void TelemetryThreadLogic(std::string IPAddr, int Port)
 	MySocket TelemetrySocket(SocketType::CLIENT, IPAddr, Port, ConnectionType::TCP, 100);
 	TelemetrySocket.ConnectTCP();	// Perform the 3-way handshake to connect to a TCP server
 
-	// ASSUMPTION: Packet body is structured in a specific sequence for parsing
+									// ASSUMPTION: Packet body is structured in a specific sequence for parsing
 	char* RxBuffer = new char[DEFAULT_SIZE];
 
 	// Receive and process incoming Telemetry packets from the Megatron forever
@@ -53,7 +53,7 @@ void TelemetryThreadLogic(std::string IPAddr, int Port)
 					char* ptr = RxBuffer + sizeof(int) + (sizeof(char) * 2);
 
 					/* Now we're at the beginning of the body (which is 5 bytes in length),
-						let's copy the first section - Sonar Sensor data */
+					let's copy the first section - Sonar Sensor data */
 					memcpy(&body.SensorData, ptr, sizeof(us));
 
 					// Move onto the Arm Position data
@@ -77,7 +77,7 @@ void TelemetryThreadLogic(std::string IPAddr, int Port)
 
 					std::cout << "Arm Position = " << body.ArmPositionData << std::endl;
 
-					std::cout << "Drive flag is: " << (int)body.Drive << std::endl;
+					std::cout << "Drive flag is: " << (ui)body.Drive << std::endl;
 
 					(body.ArmUp) ? std::cout << "Arm is Up" << std::endl : std::cout << "Arm is Down" << std::endl;
 
@@ -108,22 +108,22 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 	MySocket CommandSocket(SocketType::CLIENT, IPAddr, Port, ConnectionType::TCP, 100);
 	CommandSocket.ConnectTCP();			// Perform the 3-way handshake to connect to a TCP server
 
-	// Set the PktCount number to 0 initially then each subsequent time we'll need to increment it
+										// Set the PktCount number to 0 initially then each subsequent time we'll need to increment it
 	CommandPacket.SetPktCount(0);
 
 	while (1)
 	{
 		/*
-			Consider commands the user can enter:
+		Consider commands the user can enter:
 
-			Drive - requires drive bit to be set in header AND
-					a body consisting of a MOTORBODY struct!
+		Drive - requires drive bit to be set in header AND
+		a body consisting of a MOTORBODY struct!
 
-			Arm - requires arm bit to be set in header AND
-			a body consisting of a MOTORBODY struct!
+		Arm - requires arm bit to be set in header AND
+		a body consisting of a MOTORBODY struct!
 
-			Claw - requires claw bit to be set in header AND
-			a body consisting of a MOTORBODY struct!
+		Claw - requires claw bit to be set in header AND
+		a body consisting of a MOTORBODY struct!
 		*/
 
 		std::cout << "Select a command to tell Megatron to do:" << std::endl << std::endl;
@@ -241,6 +241,9 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 				}
 
 				CommandPacket.SetBodyData(reinterpret_cast<char*>(&motorBody), sizeof(MotorBody));
+
+				// Call the user-define time formatting function
+				ConvertToMinutes(motorBody.Duration, minutes, seconds);
 			}
 		}
 		else
@@ -248,66 +251,72 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 			std::cout << "SOMETHING WENT WRONG!" << std::endl;
 		}
 
-		/*
-			Generate the CRC before sending out packet!
+				/*
+				Generate the CRC before sending out packet!
 
-			NOTE: Body is stored as unsigned char, aka the ASCII equivalent
-			to what our user entered. If the user entered "1" and "2" for the Motorbody,
-			it stores the ASCII equivalent which is'31' and '32'. This results in the
-			number of 1's being different than what we expected.
-		*/
-		CommandPacket.CalcCRC();
+				NOTE: Body is stored as unsigned char, aka the ASCII equivalent
+				to what our user entered. If the user entered "1" and "2" for the Motorbody,
+				it stores the ASCII equivalent which is'31' and '32'. This results in the
+				number of 1's being different than what we expected.
+				*/
+				CommandPacket.CalcCRC();
 
-		TxBuffer = CommandPacket.GenPacket();
+				TxBuffer = CommandPacket.GenPacket();
 
-		// Increment the PktCount number AFTER we generate the packet to send!
-		CommandPacket.SetPktCount(CommandPacket.GetPktCount() + 1);
+				// Increment the PktCount number AFTER we generate the packet to send!
+				CommandPacket.SetPktCount(CommandPacket.GetPktCount() + 1);
 
-		CommandSocket.SendData(TxBuffer, CommandPacket.GetLength());
+				CommandSocket.SendData(TxBuffer, CommandPacket.GetLength());
 
-		// Clean up any existing data inside the Buffer
-		delete[] RxBuffer;
-		RxBuffer = new char[CommandPacket.GetLength()];
-		
-		// Wait for Senpai to acknowledge us
-		int size = CommandSocket.GetData(RxBuffer);
+				// Clean up any existing data inside the Buffer
+				delete[] RxBuffer;
+				RxBuffer = new char[CommandPacket.GetLength()];
 
-		PktDef RobotPacket(RxBuffer);
+				// Wait for Senpai to acknowledge us
+				int size = CommandSocket.GetData(RxBuffer);
 
-		/* We need to check if the Megatron acknowledged the original command we sent! */
-		if ((RobotPacket.GetCmd() == CommandPacket.GetCmd()) && RobotPacket.GetAck())
-		{
-			if (RobotPacket.CheckCRC(RxBuffer, size))	// Validating the Robots CRC
-			{
-				// Check if the SLEEP command we sent was RETURNED AND ACKNOWLEDGED by Megatron
-				if ((CommandPacket.GetCmd() == SLEEP && RobotPacket.GetCmd() == SLEEP) && RobotPacket.GetAck())
+				PktDef RobotPacket(RxBuffer);
+
+				/* We need to check if the Megatron acknowledged the original command we sent! */
+				if ((RobotPacket.GetCmd() == CommandPacket.GetCmd()) && RobotPacket.GetAck())
 				{
-					ExeComplete = true;
+					if (RobotPacket.CheckCRC(RxBuffer, size))	// Validating the Robots CRC
+					{
+						// Check if the SLEEP command we sent was RETURNED AND ACKNOWLEDGED by Megatron
+						if ((CommandPacket.GetCmd() == SLEEP && RobotPacket.GetCmd() == SLEEP) && RobotPacket.GetAck())
+						{
+							ExeComplete = true;
 
-					CommandSocket.DisconnectTCP();	// Disconnect the CommandSocket
+							CommandSocket.DisconnectTCP();	// Disconnect the CommandSocket
 
-													// Break from the Megatron's grasp
-					break;
+															// Break from the Megatron's grasp
+							break;
+						}
+						else		// Megatron acknowledged our request, let's display what he said
+						{
+							std::cout << std::endl << "*** Megatron responded with an ACK of: " << RobotPacket.GetAck() << " for our " << cmdTypeEquivalent(RobotPacket.GetCmd())
+								<< " command ***" << std::endl << std::endl;
+						}
+					}
+					else
+					{
+						// We received an incorrect CRC from the Megatron! SABOTAGE!!!
+						std::cout << "Incorrect CRC sent by Megatron. Dropping packet!" << RxBuffer;
+					}
 				}
-				else		// Megatron acknowledged our request, let's display what he said
+				else if (RobotPacket.CheckNACK())	// We received a NACK from the Megatron, aka my dating life
 				{
-					std::cout << std::endl << "*** Megatron responded with an ACK of: " << RobotPacket.GetAck() << " for our " << cmdTypeEquivalent(RobotPacket.GetCmd())
-						<< " command ***" << std::endl << std::endl;
+					std::cout << "Megatron responded with a NACK!" << std::endl;
+				}
+				else
+				{
+					std::cout << "Megatron responded with an unknown error!" << std::endl;
 				}
 			}
-			else
-			{
-				// We received an incorrect CRC from the Megatron! SABOTAGE!!!
-				std::cout << "Incorrect CRC sent by Megatron. Dropping packet!" << RxBuffer;
-			}
-		}
-		else if (RobotPacket.CheckNACK())	// We received a NACK from the Megatron, aka my dating life
-		{
-			std::cout << "Megatron responded with a NACK!" << std::endl;
 		}
 		else
 		{
-			std::cout << "Megatron responded with an unknown error!" << std::endl;
+			std::cout << "INVALID COMMAND ENTERED! READ THE INSTRUCTIONS!" << std::endl;
 		}
 	}
 }
