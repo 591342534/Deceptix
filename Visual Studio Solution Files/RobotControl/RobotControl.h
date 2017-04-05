@@ -8,6 +8,9 @@
 #ifndef PROJECT_TELEMETRYBODY_H
 #define PROJECT_TELEMETRYBODY_H
 
+#include "MySocket.h"
+#include "PktDef.h"
+
 struct TelemetryBody
 {
 private:

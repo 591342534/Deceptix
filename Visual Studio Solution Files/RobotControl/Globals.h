@@ -78,11 +78,4 @@ static std::map<CmdType, std::string> mapOfCmdTypes = {
 static std::string cmdTypeEquivalent(CmdType commandType) {
 	return mapOfCmdTypes[commandType];
 }
-
-// Function to display an integer value to it's respective time counterpart
-void static ConvertToMinutes(int value, int &minute, int &seconds)
-{
-	minute = (value % 3600) / 60;
-	seconds = value % 60;
-}
 #endif

@@ -5,8 +5,6 @@
 	Description:	Implementation file for RobotControl.h
 */
 
-#include "MySocket.h"
-#include "PktDef.h"
 #include "RobotControl.h"
 
 void TelemetryThreadLogic(std::string IPAddr, int Port)
@@ -243,9 +241,6 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 				}
 
 				CommandPacket.SetBodyData(reinterpret_cast<char*>(&motorBody), sizeof(MotorBody));
-
-				// Call the user-define time formatting function
-				ConvertToMinutes(motorBody.Duration, minutes, seconds);
 			}
 		}
 		else
