@@ -241,77 +241,61 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 				}
 
 				CommandPacket.SetBodyData(reinterpret_cast<char*>(&motorBody), sizeof(MotorBody));
-
-				// Call the user-define time formatting function
-				ConvertToMinutes(motorBody.Duration, minutes, seconds);
 			}
-		}
-		else
-		{
-			std::cout << "SOMETHING WENT WRONG!" << std::endl;
-		}
 
-				/*
-				Generate the CRC before sending out packet!
+			/*
+			Generate the CRC before sending out packet!
 
-				NOTE: Body is stored as unsigned char, aka the ASCII equivalent
-				to what our user entered. If the user entered "1" and "2" for the Motorbody,
-				it stores the ASCII equivalent which is'31' and '32'. This results in the
-				number of 1's being different than what we expected.
-				*/
-				CommandPacket.CalcCRC();
+			NOTE: Body is stored as unsigned char, aka the ASCII equivalent
+			to what our user entered. If the user entered "1" and "2" for the Motorbody,
+			it stores the ASCII equivalent which is'31' and '32'. This results in the
+			number of 1's being different than what we expected.
+			*/
+			CommandPacket.CalcCRC();
 
-				TxBuffer = CommandPacket.GenPacket();
+			TxBuffer = CommandPacket.GenPacket();
 
-				// Increment the PktCount number AFTER we generate the packet to send!
-				CommandPacket.SetPktCount(CommandPacket.GetPktCount() + 1);
+			// Increment the PktCount number AFTER we generate the packet to send!
+			CommandPacket.SetPktCount(CommandPacket.GetPktCount() + 1);
 
-				CommandSocket.SendData(TxBuffer, CommandPacket.GetLength());
+			CommandSocket.SendData(TxBuffer, CommandPacket.GetLength());
 
-				// Clean up any existing data inside the Buffer
-				delete[] RxBuffer;
-				RxBuffer = new char[CommandPacket.GetLength()];
+			// Clean up any existing data inside the Buffer
+			delete[] RxBuffer;
+			RxBuffer = new char[CommandPacket.GetLength()];
 
-				// Wait for Senpai to acknowledge us
-				int size = CommandSocket.GetData(RxBuffer);
+			// Wait for Senpai to acknowledge us
+			int size = CommandSocket.GetData(RxBuffer);
 
-				PktDef RobotPacket(RxBuffer);
+			PktDef RobotPacket(RxBuffer);
 
-				/* We need to check if the Megatron acknowledged the original command we sent! */
+			/* We need to check if the Megatron acknowledged the original command we sent! */
+			if (RobotPacket.CheckCRC(RxBuffer, size))	// Validating the Robots CRC
+			{
 				if ((RobotPacket.GetCmd() == CommandPacket.GetCmd()) && RobotPacket.GetAck())
 				{
-					if (RobotPacket.CheckCRC(RxBuffer, size))	// Validating the Robots CRC
+					// Check if the SLEEP command we sent was RETURNED AND ACKNOWLEDGED by Megatron
+					if ((CommandPacket.GetCmd() == SLEEP && RobotPacket.GetCmd() == SLEEP) && RobotPacket.GetAck())
 					{
-						// Check if the SLEEP command we sent was RETURNED AND ACKNOWLEDGED by Megatron
-						if ((CommandPacket.GetCmd() == SLEEP && RobotPacket.GetCmd() == SLEEP) && RobotPacket.GetAck())
-						{
-							ExeComplete = true;
-
-							CommandSocket.DisconnectTCP();	// Disconnect the CommandSocket
-
-															// Break from the Megatron's grasp
-							break;
-						}
-						else		// Megatron acknowledged our request, let's display what he said
-						{
-							std::cout << std::endl << "*** Megatron responded with an ACK of: " << RobotPacket.GetAck() << " for our " << cmdTypeEquivalent(RobotPacket.GetCmd())
-								<< " command ***" << std::endl << std::endl;
-						}
+						CommandSocket.DisconnectTCP();		// Disconnect the CommandSocket
+						
+						ExeComplete = true;
 					}
-					else
+					else		// Megatron acknowledged our request, let's display what he said
 					{
-						// We received an incorrect CRC from the Megatron! SABOTAGE!!!
-						std::cout << "Incorrect CRC sent by Megatron. Dropping packet!" << RxBuffer;
+						std::cout << std::endl << "*** Megatron responded with an ACK of: " << RobotPacket.GetAck() << " for our " << cmdTypeEquivalent(RobotPacket.GetCmd())
+							<< " command ***" << std::endl << std::endl;
 					}
 				}
 				else if (RobotPacket.CheckNACK())	// We received a NACK from the Megatron, aka my dating life
 				{
 					std::cout << "Megatron responded with a NACK!" << std::endl;
 				}
-				else
-				{
-					std::cout << "Megatron responded with an unknown error!" << std::endl;
-				}
+			}
+			else
+			{
+				// We received an incorrect CRC from the Megatron! SABOTAGE!!!
+				std::cout << "Incorrect CRC sent by Megatron. Dropping packet!" << RxBuffer;
 			}
 		}
 		else
