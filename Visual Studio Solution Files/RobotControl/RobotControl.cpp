@@ -113,19 +113,6 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 
 	while (1)
 	{
-		/*
-		Consider commands the user can enter:
-
-		Drive - requires drive bit to be set in header AND
-		a body consisting of a MOTORBODY struct!
-
-		Arm - requires arm bit to be set in header AND
-		a body consisting of a MOTORBODY struct!
-
-		Claw - requires claw bit to be set in header AND
-		a body consisting of a MOTORBODY struct!
-		*/
-
 		std::cout << "Select a command to tell Megatron to do:" << std::endl << std::endl;
 		std::cout << "0 - DRIVE\n1 - SLEEP\n2 - ARM\n3 - CLAW" << std::endl;
 
@@ -243,14 +230,7 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 				CommandPacket.SetBodyData(reinterpret_cast<char*>(&motorBody), sizeof(MotorBody));
 			}
 
-			/*
-			Generate the CRC before sending out packet!
-
-			NOTE: Body is stored as unsigned char, aka the ASCII equivalent
-			to what our user entered. If the user entered "1" and "2" for the Motorbody,
-			it stores the ASCII equivalent which is'31' and '32'. This results in the
-			number of 1's being different than what we expected.
-			*/
+			// Calculate the CRC before sending out packet!
 			CommandPacket.CalcCRC();
 
 			TxBuffer = CommandPacket.GenPacket();
@@ -278,7 +258,7 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 					if ((CommandPacket.GetCmd() == SLEEP && RobotPacket.GetCmd() == SLEEP) && RobotPacket.GetAck())
 					{
 						CommandSocket.DisconnectTCP();		// Disconnect the CommandSocket
-						
+
 						ExeComplete = true;
 					}
 					else		// Megatron acknowledged our request, let's display what he said
