@@ -1,5 +1,5 @@
-﻿  RobotGUI.cpp
-  .NETFramework,Version=v4.5.2.AssemblyAttributes.cpp
-  RobotGUI.obj : /DEBUG:FASTLINK is not supported when managed code is present; restarting link with /DEBUG:FULL
-LINK : error LNK2001: unresolved external symbol _main
-C:\Users\Sean\Desktop\version-control\Academic Projects\Decepticon_Communication_Software\Visual Studio Solution Files\RobotGUI\Debug\RobotGUI.exe : fatal error LNK1120: 1 unresolved externals
+﻿  MySocket.cpp
+  PktDef.cpp
+  RobotControl.cpp
+  Generating Code...
+cl : Command line error D8016: '/clr' and '/MTd' command-line options are incompatible

@@ -57,6 +57,7 @@ namespace RobotGUI {
 	private: System::Windows::Forms::ComboBox^  cmbBoxDuration;
 	private: System::Windows::Forms::Label^  lblDuration;
 	private: System::Windows::Forms::Label^  lblDirection;
+	private: System::Windows::Forms::Button^  btnSendCommand;
 
 
 
@@ -96,6 +97,7 @@ namespace RobotGUI {
 			this->cmbBoxDuration = (gcnew System::Windows::Forms::ComboBox());
 			this->lblDirection = (gcnew System::Windows::Forms::Label());
 			this->lblDuration = (gcnew System::Windows::Forms::Label());
+			this->btnSendCommand = (gcnew System::Windows::Forms::Button());
 			this->grpboxCommandTypes->SuspendLayout();
 			this->grpBoxCommandSocket->SuspendLayout();
 			this->grpBoxTelemetrySocket->SuspendLayout();
@@ -103,28 +105,37 @@ namespace RobotGUI {
 			// 
 			// lstboxRobotOutput
 			// 
-			this->lstboxRobotOutput->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
-				static_cast<System::Byte>(0)));
+			this->lstboxRobotOutput->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 9.75F, System::Drawing::FontStyle::Regular,
+				System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(0)));
 			this->lstboxRobotOutput->FormattingEnabled = true;
-			this->lstboxRobotOutput->ItemHeight = 20;
-			this->lstboxRobotOutput->Location = System::Drawing::Point(12, 469);
+			this->lstboxRobotOutput->ItemHeight = 16;
+			this->lstboxRobotOutput->Location = System::Drawing::Point(12, 529);
+			this->lstboxRobotOutput->MultiColumn = true;
 			this->lstboxRobotOutput->Name = L"lstboxRobotOutput";
-			this->lstboxRobotOutput->Size = System::Drawing::Size(583, 124);
+			this->lstboxRobotOutput->ScrollAlwaysVisible = true;
+			this->lstboxRobotOutput->SelectionMode = System::Windows::Forms::SelectionMode::None;
+			this->lstboxRobotOutput->Size = System::Drawing::Size(583, 132);
 			this->lstboxRobotOutput->TabIndex = 0;
 			this->lstboxRobotOutput->TabStop = false;
 			// 
 			// txtboxCommandIPAddress
 			// 
+			this->txtboxCommandIPAddress->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular,
+				System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(0)));
 			this->txtboxCommandIPAddress->Location = System::Drawing::Point(238, 35);
+			this->txtboxCommandIPAddress->MaxLength = 15;
 			this->txtboxCommandIPAddress->Name = L"txtboxCommandIPAddress";
-			this->txtboxCommandIPAddress->Size = System::Drawing::Size(151, 31);
+			this->txtboxCommandIPAddress->Size = System::Drawing::Size(151, 26);
 			this->txtboxCommandIPAddress->TabIndex = 0;
 			// 
 			// txtboxTelemetryIPAddress
 			// 
+			this->txtboxTelemetryIPAddress->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular,
+				System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(0)));
 			this->txtboxTelemetryIPAddress->Location = System::Drawing::Point(234, 32);
+			this->txtboxTelemetryIPAddress->MaxLength = 15;
 			this->txtboxTelemetryIPAddress->Name = L"txtboxTelemetryIPAddress";
-			this->txtboxTelemetryIPAddress->Size = System::Drawing::Size(151, 31);
+			this->txtboxTelemetryIPAddress->Size = System::Drawing::Size(151, 26);
 			this->txtboxTelemetryIPAddress->TabIndex = 3;
 			// 
 			// lblCommandSocketIPAddress
@@ -159,12 +170,13 @@ namespace RobotGUI {
 			this->btnCommandSocketConnect->TabIndex = 2;
 			this->btnCommandSocketConnect->Text = L"Connect Command Socket";
 			this->btnCommandSocketConnect->UseVisualStyleBackColor = true;
+			this->btnCommandSocketConnect->Click += gcnew System::EventHandler(this, &RobotGUI::btnCommandSocketConnect_Click);
 			// 
 			// btnTelemetrySocketConnect
 			// 
 			this->btnTelemetrySocketConnect->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular,
 				System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(0)));
-			this->btnTelemetrySocketConnect->Location = System::Drawing::Point(408, 52);
+			this->btnTelemetrySocketConnect->Location = System::Drawing::Point(412, 52);
 			this->btnTelemetrySocketConnect->Name = L"btnTelemetrySocketConnect";
 			this->btnTelemetrySocketConnect->Size = System::Drawing::Size(162, 34);
 			this->btnTelemetrySocketConnect->TabIndex = 6;
@@ -174,6 +186,7 @@ namespace RobotGUI {
 			// 
 			// grpboxCommandTypes
 			// 
+			this->grpboxCommandTypes->Controls->Add(this->btnSendCommand);
 			this->grpboxCommandTypes->Controls->Add(this->lblDuration);
 			this->grpboxCommandTypes->Controls->Add(this->lblDirection);
 			this->grpboxCommandTypes->Controls->Add(this->cmbBoxDuration);
@@ -186,10 +199,10 @@ namespace RobotGUI {
 				System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(0)));
 			this->grpboxCommandTypes->Location = System::Drawing::Point(12, 287);
 			this->grpboxCommandTypes->Name = L"grpboxCommandTypes";
-			this->grpboxCommandTypes->Size = System::Drawing::Size(583, 166);
+			this->grpboxCommandTypes->Size = System::Drawing::Size(583, 236);
 			this->grpboxCommandTypes->TabIndex = 7;
 			this->grpboxCommandTypes->TabStop = false;
-			this->grpboxCommandTypes->Text = L"Available Commands";
+			this->grpboxCommandTypes->Text = L"Command Selection";
 			this->grpboxCommandTypes->Enter += gcnew System::EventHandler(this, &RobotGUI::grpboxCommandTypes_Enter);
 			// 
 			// rdioBtnDrive
@@ -200,7 +213,7 @@ namespace RobotGUI {
 			this->rdioBtnDrive->Location = System::Drawing::Point(14, 46);
 			this->rdioBtnDrive->Name = L"rdioBtnDrive";
 			this->rdioBtnDrive->Size = System::Drawing::Size(63, 24);
-			this->rdioBtnDrive->TabIndex = 4;
+			this->rdioBtnDrive->TabIndex = 5;
 			this->rdioBtnDrive->TabStop = true;
 			this->rdioBtnDrive->Text = L"Drive";
 			this->rdioBtnDrive->UseVisualStyleBackColor = true;
@@ -213,7 +226,7 @@ namespace RobotGUI {
 			this->rdioBtnArm->Location = System::Drawing::Point(346, 46);
 			this->rdioBtnArm->Name = L"rdioBtnArm";
 			this->rdioBtnArm->Size = System::Drawing::Size(56, 24);
-			this->rdioBtnArm->TabIndex = 5;
+			this->rdioBtnArm->TabIndex = 7;
 			this->rdioBtnArm->TabStop = true;
 			this->rdioBtnArm->Text = L"Arm";
 			this->rdioBtnArm->UseVisualStyleBackColor = true;
@@ -239,16 +252,19 @@ namespace RobotGUI {
 			this->rdioBtnSleep->Location = System::Drawing::Point(502, 46);
 			this->rdioBtnSleep->Name = L"rdioBtnSleep";
 			this->rdioBtnSleep->Size = System::Drawing::Size(68, 24);
-			this->rdioBtnSleep->TabIndex = 7;
+			this->rdioBtnSleep->TabIndex = 8;
 			this->rdioBtnSleep->TabStop = true;
 			this->rdioBtnSleep->Text = L"Sleep";
 			this->rdioBtnSleep->UseVisualStyleBackColor = true;
 			// 
 			// txtboxCommandSocketPort
 			// 
-			this->txtboxCommandSocketPort->Location = System::Drawing::Point(238, 70);
+			this->txtboxCommandSocketPort->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular,
+				System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(0)));
+			this->txtboxCommandSocketPort->Location = System::Drawing::Point(238, 72);
+			this->txtboxCommandSocketPort->MaxLength = 5;
 			this->txtboxCommandSocketPort->Name = L"txtboxCommandSocketPort";
-			this->txtboxCommandSocketPort->Size = System::Drawing::Size(151, 31);
+			this->txtboxCommandSocketPort->Size = System::Drawing::Size(151, 26);
 			this->txtboxCommandSocketPort->TabIndex = 1;
 			// 
 			// lblCommandSocketPort
@@ -267,7 +283,7 @@ namespace RobotGUI {
 			this->lblTelemetrySocketPort->AutoSize = true;
 			this->lblTelemetrySocketPort->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular,
 				System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(0)));
-			this->lblTelemetrySocketPort->Location = System::Drawing::Point(35, 79);
+			this->lblTelemetrySocketPort->Location = System::Drawing::Point(35, 76);
 			this->lblTelemetrySocketPort->Name = L"lblTelemetrySocketPort";
 			this->lblTelemetrySocketPort->Size = System::Drawing::Size(169, 20);
 			this->lblTelemetrySocketPort->TabIndex = 11;
@@ -275,10 +291,13 @@ namespace RobotGUI {
 			// 
 			// txtboxTelemetrySocketPort
 			// 
-			this->txtboxTelemetrySocketPort->Location = System::Drawing::Point(234, 72);
+			this->txtboxTelemetrySocketPort->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular,
+				System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(0)));
+			this->txtboxTelemetrySocketPort->Location = System::Drawing::Point(234, 69);
+			this->txtboxTelemetrySocketPort->MaxLength = 5;
 			this->txtboxTelemetrySocketPort->Name = L"txtboxTelemetrySocketPort";
-			this->txtboxTelemetrySocketPort->Size = System::Drawing::Size(151, 31);
-			this->txtboxTelemetrySocketPort->TabIndex = 3;
+			this->txtboxTelemetrySocketPort->Size = System::Drawing::Size(151, 26);
+			this->txtboxTelemetrySocketPort->TabIndex = 4;
 			// 
 			// grpBoxCommandSocket
 			// 
@@ -314,23 +333,28 @@ namespace RobotGUI {
 			// 
 			// cmbBoxDirection
 			// 
+			this->cmbBoxDirection->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(0)));
 			this->cmbBoxDirection->FormattingEnabled = true;
-			this->cmbBoxDirection->Items->AddRange(gcnew cli::array< System::Object^  >(5) {
+			this->cmbBoxDirection->Items->AddRange(gcnew cli::array< System::Object^  >(11) {
 				L"---", L"Forward", L"Backward", L"Right",
-					L"Left"
+					L"Left", L"---", L"Up", L"Down", L"---", L"Open", L"Close"
 			});
 			this->cmbBoxDirection->Location = System::Drawing::Point(51, 114);
 			this->cmbBoxDirection->Name = L"cmbBoxDirection";
-			this->cmbBoxDirection->Size = System::Drawing::Size(153, 33);
-			this->cmbBoxDirection->TabIndex = 8;
+			this->cmbBoxDirection->Size = System::Drawing::Size(153, 28);
+			this->cmbBoxDirection->TabIndex = 9;
 			// 
 			// cmbBoxDuration
 			// 
+			this->cmbBoxDuration->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(0)));
 			this->cmbBoxDuration->FormattingEnabled = true;
-			this->cmbBoxDuration->Location = System::Drawing::Point(367, 114);
+			this->cmbBoxDuration->Items->AddRange(gcnew cli::array< System::Object^  >(6) { L"0", L"1", L"2", L"3", L"4", L"5" });
+			this->cmbBoxDuration->Location = System::Drawing::Point(374, 114);
 			this->cmbBoxDuration->Name = L"cmbBoxDuration";
-			this->cmbBoxDuration->Size = System::Drawing::Size(153, 33);
-			this->cmbBoxDuration->TabIndex = 9;
+			this->cmbBoxDuration->Size = System::Drawing::Size(153, 28);
+			this->cmbBoxDuration->TabIndex = 10;
 			// 
 			// lblDirection
 			// 
@@ -339,6 +363,7 @@ namespace RobotGUI {
 				static_cast<System::Byte>(0)));
 			this->lblDirection->Location = System::Drawing::Point(87, 86);
 			this->lblDirection->Name = L"lblDirection";
+			this->lblDirection->RightToLeft = System::Windows::Forms::RightToLeft::No;
 			this->lblDirection->Size = System::Drawing::Size(81, 20);
 			this->lblDirection->TabIndex = 10;
 			this->lblDirection->Text = L"Direction";
@@ -354,13 +379,22 @@ namespace RobotGUI {
 			this->lblDuration->TabIndex = 11;
 			this->lblDuration->Text = L"Duration";
 			// 
+			// btnSendCommand
+			// 
+			this->btnSendCommand->Location = System::Drawing::Point(154, 163);
+			this->btnSendCommand->Name = L"btnSendCommand";
+			this->btnSendCommand->Size = System::Drawing::Size(248, 57);
+			this->btnSendCommand->TabIndex = 12;
+			this->btnSendCommand->Text = L"Submit Command";
+			this->btnSendCommand->UseVisualStyleBackColor = true;
+			// 
 			// RobotGUI
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->AutoSize = true;
 			this->BackColor = System::Drawing::SystemColors::Control;
-			this->ClientSize = System::Drawing::Size(605, 604);
+			this->ClientSize = System::Drawing::Size(605, 673);
 			this->Controls->Add(this->grpBoxTelemetrySocket);
 			this->Controls->Add(this->grpBoxCommandSocket);
 			this->Controls->Add(this->grpboxCommandTypes);
@@ -386,6 +420,10 @@ namespace RobotGUI {
 	private: System::Void grpboxCommandTypes_Enter(System::Object^  sender, System::EventArgs^  e) {
 	}
 private: System::Void RobotGUI_Load(System::Object^  sender, System::EventArgs^  e) {
+}
+private: System::Void btnCommandSocketConnect_Click(System::Object^  sender, System::EventArgs^  e) {
+	
+
 }
 };
 }

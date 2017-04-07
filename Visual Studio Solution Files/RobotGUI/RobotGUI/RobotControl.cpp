@@ -1,17 +1,11 @@
 /*
-	Title:			BTN415 Project - Robotic Control Software - Winter 2016
-	Author(s):		Sean Prashad, Hao Chen, Stephen Noble
-	Student ID:		029-736-105, 022-905-152, 018-619-155
-	Description:	Implementation file for RobotControl.h
+Title:			BTN415 Project - Robotic Control Software - Winter 2016
+Author(s):		Sean Prashad, Hao Chen, Stephen Noble
+Student ID:		029-736-105, 022-905-152, 018-619-155
+Description:	Implementation file for RobotControl.h
 */
 
-#include "RobotGUI.h"
 #include "RobotControl.h"
-
-using namespace std;
-
-using namespace System;
-using namespace System::Windows::Forms;
 
 void TelemetryThreadLogic(std::string IPAddr, int Port)
 {
@@ -284,7 +278,7 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 					if ((CommandPacket.GetCmd() == SLEEP && RobotPacket.GetCmd() == SLEEP) && RobotPacket.GetAck())
 					{
 						CommandSocket.DisconnectTCP();		// Disconnect the CommandSocket
-
+						
 						ExeComplete = true;
 					}
 					else		// Megatron acknowledged our request, let's display what he said
@@ -311,52 +305,31 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 	}
 }
 
-[STAThread]
-int main()
+int main(int argc, char *argv[])
 {
-	Application::EnableVisualStyles();
-	Application::SetCompatibleTextRenderingDefault(false);
-	RobotGUI::RobotGUI form;
-	Application::Run(%form);
+	std::cout << "Command Line : ";
+
+	for (int i = 1; i < argc; i++)
+	{
+		std::cout << argv[i] << " ";
+	}
+
+	if ((argc < 3) || (argv == NULL))	/* .Exe file path always submitted via argv, therefore
+										recognize more than 1 argument which indicates some type of user input */
+	{
+		std::cout << "Insufficient number of arguments (minimum of 2)" << std::endl;
+
+		exit(0);
+	}
 
 	ExeComplete = false;
 
 	// First argument is the function we want to call (aka the logic), arguments thereafter are the ARGUMENTS to that specific function
-	std::thread(CommandThreadLogic).detach();
+	std::thread(CommandThreadLogic, argv[1], std::atoi(argv[2])).detach();
 
 	// Telemetry thread will use the same IP address as the command thread. 
-	std::thread(TelemetryThreadLogic).detach();
+	std::thread(TelemetryThreadLogic, argv[1], std::atoi(argv[3])).detach();
 
 	// Loop forever until ExeComplete is true!
 	while (!ExeComplete) {}
 }
-
-//
-//int main(int argc, char *argv[])
-//{
-//	std::cout << "Command Line : ";
-//
-//	for (int i = 1; i < argc; i++)
-//	{
-//		std::cout << argv[i] << " ";
-//	}
-//
-//	if ((argc < 3) || (argv == NULL))	/* .Exe file path always submitted via argv, therefore
-//										recognize more than 1 argument which indicates some type of user input */
-//	{
-//		std::cout << "Insufficient number of arguments (minimum of 2)" << std::endl;
-//
-//		exit(0);
-//	}
-//
-//	ExeComplete = false;
-//
-//	// First argument is the function we want to call (aka the logic), arguments thereafter are the ARGUMENTS to that specific function
-//	std::thread(CommandThreadLogic, argv[1], std::atoi(argv[2])).detach();
-//
-//	// Telemetry thread will use the same IP address as the command thread. 
-//	std::thread(TelemetryThreadLogic, argv[1], std::atoi(argv[3])).detach();
-//
-//	// Loop forever until ExeComplete is true!
-//	while (!ExeComplete) {}
-//}
