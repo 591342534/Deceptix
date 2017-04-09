@@ -1,5 +1,0 @@
-﻿  MySocket.cpp
-  PktDef.cpp
-  RobotControl.cpp
-  Generating Code...
-cl : Command line error D8016: '/clr' and '/MTd' command-line options are incompatible

@@ -103,7 +103,6 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 	PktDef CommandPacket;
 	char* RxBuffer = nullptr;
 	char* TxBuffer = nullptr;
-	int minutes = 0, seconds = 0;
 
 	MySocket CommandSocket(SocketType::CLIENT, IPAddr, Port, ConnectionType::TCP, 100);
 	CommandSocket.ConnectTCP();			// Perform the 3-way handshake to connect to a TCP server
@@ -307,7 +306,7 @@ int main(int argc, char *argv[])
 	// First argument is the function we want to call (aka the logic), arguments thereafter are the ARGUMENTS to that specific function
 	std::thread(CommandThreadLogic, argv[1], std::atoi(argv[2])).detach();
 
-	// Telemetry thread will use the same IP address as the command thread. 
+	// Telemetry thread will use the same IP address as the command thread
 	std::thread(TelemetryThreadLogic, argv[1], std::atoi(argv[3])).detach();
 
 	// Loop forever until ExeComplete is true!
