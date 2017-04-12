@@ -4,6 +4,10 @@
 
 **Team Members**: [Sean Prashad](https://github.com/SeanPrashad), [Hao Chen](https://github.com/haoRchen) and [Stephen Noble](https://github.com/hsnoble)
 
+**Project Video**:
+
+[![Decepticon Video Thumbnail](./Images/Decepticon_Video_Thumbnail.JPG)](https://youtu.be/9DoJy6RVUhE "Decepticon Video Demo")
+
 **Project Photos**:
 
 ![Decepticon Collage View](./Images/Decepticon_Collage_View.JPG "Decepticon Collage View")
