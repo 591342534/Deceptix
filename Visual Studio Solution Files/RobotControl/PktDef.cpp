@@ -97,6 +97,7 @@ void PktDef::SetCmd(CmdType newCmdType)
 		CmdPacket.Header.Arm = 0;
 		CmdPacket.Header.Claw = 0;
 		CmdPacket.Header.Ack = 0;
+		CmdPacket.Header.Padding = 0;
 		break;
 	case SLEEP:
 		CmdPacket.Header.Drive = 0;
@@ -104,6 +105,7 @@ void PktDef::SetCmd(CmdType newCmdType)
 		CmdPacket.Header.Arm = 0;
 		CmdPacket.Header.Claw = 0;
 		CmdPacket.Header.Ack = 0;
+		CmdPacket.Header.Padding = 0;
 
 		delete CmdPacket.Data;
 		CmdPacket.Data = nullptr;
@@ -116,6 +118,7 @@ void PktDef::SetCmd(CmdType newCmdType)
 		CmdPacket.Header.Arm = 1;
 		CmdPacket.Header.Claw = 0;
 		CmdPacket.Header.Ack = 0;
+		CmdPacket.Header.Padding = 0;
 		break;
 	case CLAW:
 		CmdPacket.Header.Drive = 0;
@@ -123,9 +126,8 @@ void PktDef::SetCmd(CmdType newCmdType)
 		CmdPacket.Header.Arm = 0;
 		CmdPacket.Header.Claw = 1;
 		CmdPacket.Header.Ack = 0;
+		CmdPacket.Header.Padding = 0;
 		break;
-	case ACK:
-		CmdPacket.Header.Ack = 1;
 	default:
 		break;
 	}

@@ -23,7 +23,7 @@ public:
 							send a STATUS command with ACK set to 1 as well at the bit corresponding to the command
 							also set to 1
 						*/
-	uc Padding : 1;
+	uc Padding : 2;
 	uc Length;			// Contains the TOTAL NUMBER of bytes in the ENTIRE packet
 
 	CmdPacketHeader()

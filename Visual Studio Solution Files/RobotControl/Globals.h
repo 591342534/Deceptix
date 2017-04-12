@@ -34,7 +34,8 @@ enum ConnectionType
 const ui DEFAULT_SIZE = 128;			// Max size of our Buffer for the MySocket class
 static bool ExeComplete = false;		// Global flag used for Robot control execution
 
-enum CmdType				// Enumeration to define the command types for the Robot
+// Enumeration to define the command types for the Robot
+enum CmdType
 {
 	DRIVE = 0,
 	SLEEP,

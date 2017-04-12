@@ -107,7 +107,7 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 	MySocket CommandSocket(SocketType::CLIENT, IPAddr, Port, ConnectionType::TCP, 100);
 	CommandSocket.ConnectTCP();			// Perform the 3-way handshake to connect to a TCP server
 
-										// Set the PktCount number to 0 initially then each subsequent time we'll need to increment it
+	// Set the PktCount number to 0 initially then each subsequent time we'll need to increment it
 	CommandPacket.SetPktCount(0);
 
 	while (1)
@@ -119,7 +119,7 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 		int commandType = -1;		/* http://stackoverflow.com/questions/13421965/using-cin-get-to-get-an-integer */
 		std::cin >> commandType;
 
-		if ((commandType == 0) || (commandType == 1) || (commandType == 2) || (commandType == 3))
+		if ((commandType == DRIVE) || (commandType == SLEEP) || (commandType == ARM) || (commandType == CLAW))
 		{
 			CmdType commandTypeEnum;
 
