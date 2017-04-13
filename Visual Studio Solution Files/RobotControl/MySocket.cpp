@@ -178,7 +178,7 @@ void MySocket::DisconnectTCP()
 		if (mySocket == SERVER) { closesocket(WelcomeSocket); }
 
 		closesocket(ConnectionSocket);
-		
+
 		bTCPConnect = false;
 
 		// Free Winsock DLL resources
@@ -200,8 +200,7 @@ void MySocket::SendData(const char* rawData, int bufferLength)
 	}
 }
 
-/* Function used to receive data on the internal buffer then copy it to the argument buffer.
-Works with both TCP and UDP. */
+// Function used to receive data on the internal buffer then copy it to the argument buffer. Works with both TCP and UDP
 int MySocket::GetData(char* rawData)
 {
 	int numOfBytesReceived = 0;

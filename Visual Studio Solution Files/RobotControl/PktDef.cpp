@@ -181,7 +181,7 @@ bool PktDef::GetAck()
 
 int PktDef::GetLength()
 {
-	return CmdPacket.Header.Length;
+	return (int)CmdPacket.Header.Length;
 }
 
 int PktDef::CalculateBodyLength()		// Additional function to calculate the dynamic body's size

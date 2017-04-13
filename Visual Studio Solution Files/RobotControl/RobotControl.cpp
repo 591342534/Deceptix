@@ -125,16 +125,16 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 
 			switch (commandType)
 			{
-			case 0:
+			case DRIVE:
 				commandTypeEnum = DRIVE;
 				break;
-			case 1:
+			case SLEEP:
 				commandTypeEnum = SLEEP;
 				break;
-			case 2:
+			case ARM:
 				commandTypeEnum = ARM;
 				break;
-			case 3:
+			case CLAW:
 				commandTypeEnum = CLAW;
 				break;
 			}
