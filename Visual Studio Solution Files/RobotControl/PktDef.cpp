@@ -155,7 +155,7 @@ void PktDef::SetBodyData(char* rawData, int bufferLength)
 
 void PktDef::SetPktCount(int newPktCount)
 {
-	CmdPacket.Header.PktCount = newPktCount;
+	(newPktCount > (ui)-1) ? CmdPacket.Header.PktCount = newPktCount : CmdPacket.Header.PktCount = (ui)-1;
 }
 
 CmdType PktDef::GetCmd()
