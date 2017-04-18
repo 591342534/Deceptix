@@ -71,7 +71,7 @@ PktDef::PktDef(char* rawData)		// Constructor called when we receive a stream of
 			values from the sonar sensors, the battery voltage or something else.
 		*/
 
-		ptr += HEADERSIZE;	// Do NOT need HEADERSIZEOFFSET since our rawData is contiguous inside rawData!
+		ptr += HEADERSIZE;	// Do NOT need HEADERSIZEOFFSET since our data is contiguous inside rawData!
 
 		/*
 			The parsed Length of the entire packet minus the HEADERSIZE will give us the remaining amount of bytes to
@@ -155,7 +155,7 @@ void PktDef::SetBodyData(char* rawData, int bufferLength)
 
 void PktDef::SetPktCount(int newPktCount)
 {
-	(newPktCount > (ui)-1) ? CmdPacket.Header.PktCount = newPktCount : CmdPacket.Header.PktCount = (ui)-1;
+	(newPktCount > 0) ? CmdPacket.Header.PktCount = newPktCount : CmdPacket.Header.PktCount = 0;
 }
 
 CmdType PktDef::GetCmd()
@@ -176,7 +176,7 @@ bool PktDef::GetAck()
 		Is the Header's ACK flag set equal to 1? (aka is it true?),
 		if so, return TRUE otherwise return FALSE.
 	*/
-	return (CmdPacket.Header.Ack == 1 ? true : false);
+	return (CmdPacket.Header.Ack ? true : false);
 }
 
 int PktDef::GetLength()

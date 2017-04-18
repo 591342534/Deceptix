@@ -12,7 +12,7 @@ void TelemetryThreadLogic(std::string IPAddr, int Port)
 	MySocket TelemetrySocket(SocketType::CLIENT, IPAddr, Port, ConnectionType::TCP, 100);
 	TelemetrySocket.ConnectTCP();	// Perform the 3-way handshake to connect to a TCP server
 
-									// ASSUMPTION: Packet body is structured in a specific sequence for parsing
+	// ASSUMPTION: Packet body is structured in a specific sequence for parsing
 	char* RxBuffer = new char[DEFAULT_SIZE];
 
 	// Receive and process incoming Telemetry packets from the Megatron forever
@@ -241,7 +241,7 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 
 			// Clean up any existing data inside the Buffer
 			delete[] RxBuffer;
-			RxBuffer = new char[CommandPacket.GetLength()];
+			RxBuffer = new char[DEFAULT_SIZE];
 
 			// Wait for Senpai to acknowledge us
 			int size = CommandSocket.GetData(RxBuffer);
@@ -249,13 +249,16 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 			PktDef RobotPacket(RxBuffer);
 
 			/* We need to check if the Megatron acknowledged the original command we sent! */
-			if (RobotPacket.CheckCRC(RxBuffer, size))	// Validating the Robots CRC
+			if (RobotPacket.CheckCRC(RxBuffer, size))	// Validate the Robots CRC
 			{
 				if ((RobotPacket.GetCmd() == CommandPacket.GetCmd()) && RobotPacket.GetAck())
 				{
 					// Check if the SLEEP command we sent was RETURNED AND ACKNOWLEDGED by Megatron
 					if ((CommandPacket.GetCmd() == SLEEP && RobotPacket.GetCmd() == SLEEP) && RobotPacket.GetAck())
 					{
+						delete[] TxBuffer; TxBuffer = nullptr;
+						delete[] RxBuffer; RxBuffer = nullptr;
+
 						CommandSocket.DisconnectTCP();		// Disconnect the CommandSocket
 
 						ExeComplete = true;
@@ -268,18 +271,18 @@ void CommandThreadLogic(std::string IPAddr, int Port)
 				}
 				else if (RobotPacket.CheckNACK())	// We received a NACK from the Megatron, aka my dating life
 				{
-					std::cout << "Megatron responded with a NACK!" << std::endl;
+					std::cerr << "Megatron responded with a NACK!" << std::endl;
 				}
 			}
 			else
 			{
 				// We received an incorrect CRC from the Megatron! SABOTAGE!!!
-				std::cout << "Incorrect CRC sent by Megatron. Dropping packet!" << RxBuffer;
+				std::cerr << "Incorrect CRC sent by Megatron. Dropping packet!" << RxBuffer;
 			}
 		}
 		else
 		{
-			std::cout << "INVALID COMMAND ENTERED! READ THE INSTRUCTIONS!" << std::endl;
+			std::cerr << "INVALID COMMAND ENTERED! READ THE INSTRUCTIONS!" << std::endl;
 		}
 	}
 }

@@ -33,11 +33,7 @@ MySocket::MySocket(SocketType newSocketType, std::string newIPAddr, int newPort,
 
 	bTCPConnect = false;
 
-	if (connectionType == TCP && mySocket == SERVER)
-	{
-		ConnectTCP();
-	}
-	else if (connectionType == UDP)
+	if (connectionType == UDP)
 	{
 		// DO NOT initialize WelcomeSocket - that is used for TCP connections only!
 		ConnectionSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -63,11 +59,17 @@ MySocket::MySocket(SocketType newSocketType, std::string newIPAddr, int newPort,
 	}
 }
 
-// Destructor to deallocate dynamic data
+// Destructor to release dynamic data and other resources
 MySocket::~MySocket()
 {
 	delete[] Buffer;
 	Buffer = nullptr;
+
+	closesocket(WelcomeSocket);
+	closesocket(ConnectionSocket);
+
+	// Free Winsock DLL resources
+	WSACleanup();
 }
 
 // Boots up the Windows socket libraries (to use functions like send, recv etc)
@@ -175,14 +177,9 @@ void MySocket::DisconnectTCP()
 {
 	if (bTCPConnect)
 	{
-		if (mySocket == SERVER) { closesocket(WelcomeSocket); }
-
-		closesocket(ConnectionSocket);
-
 		bTCPConnect = false;
 
-		// Free Winsock DLL resources
-		WSACleanup();
+		closesocket(ConnectionSocket);	// Close the socket used regardless of TCP/UDP for sending data
 	}
 }
 
