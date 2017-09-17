@@ -1,4 +1,4 @@
-# Decepticon Communication Software ![Decepticon Icon](./Images/Decepticon_Icon.jpg "Decepticon Icon")
+# Deceptix ![Deceptix Icon](./Images/Deceptix_Icon.jpg "Deceptix Icon")
 
 **Description**: A TCP/IP application written in C++ designed to interface with and remotely control a robot designed by [Dr. Elliot Coleshill](https://github.com/ecoleshill). Commands included the ability to drive in all directions, raise or lower the front-facing arm and open or close the mounted claw. Real-time communication both to and from the robot was possible by implementing multiple threads which opened a bidirectional channel for robot commands and telemetry data.
 
@@ -6,16 +6,16 @@
 
 **Project Video**:
 
-[![Decepticon Video Thumbnail](./Images/Decepticon_Video_Thumbnail.jpg)](https://youtu.be/9DoJy6RVUhE "Decepticon Video Demo")
+[![Deceptix Video Thumbnail](./Images/Deceptix_Video_Thumbnail.jpg)](https://youtu.be/9DoJy6RVUhE "Deceptix Video Demo")
 
 **Project Photos**:
 
-![Decepticon Collage View](./Images/Decepticon_Collage_View.jpg "Decepticon Collage View")
+![Deceptix Collage View](./Images/Deceptix_Collage_View.jpg "Deceptix Collage View")
 
-![Decepticon Front View](./Images/Decepticon_Front_View.jpg "Decepticon Front View")
+![Deceptix Front View](./Images/Deceptix_Front_View.jpg "Deceptix Front View")
 
-![Decepticon Side View](./Images/Decepticon_Side_View.jpg "Decepticon Side View")
+![Deceptix Side View](./Images/Deceptix_Side_View.jpg "Deceptix Side View")
 
-![Decepticon Arm View](./Images/Decepticon_Arm_View.jpg "Decepticon Arm View")
+![Deceptix Arm View](./Images/Deceptix_Arm_View.jpg "Deceptix Arm View")
 
-![Decepticon Claw View](./Images/Decepticon_Claw_View.jpg "Decepticon Claw View")
+![Deceptix Claw View](./Images/Deceptix_Claw_View.jpg "Deceptix Claw View")
